@@ -1,0 +1,2140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Fortune</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh;color:#1e293b}
+#app{max-width:520px;margin:0 auto;min-height:100vh;background:#fff;display:flex;flex-direction:column;box-shadow:0 0 40px rgba(0,0,0,0.10)}
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f0f4f8;padding:20px}
+.login-card{background:#fff;border-radius:18px;padding:40px 32px;width:100%;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,0.10);text-align:center}
+.login-logo{font-size:48px;margin-bottom:10px}
+.login-title{font-size:26px;font-weight:800;color:#0f172a;margin-bottom:4px}
+.login-sub{font-size:13px;color:#94a3b8;margin-bottom:28px}
+.toggle-row{display:flex;background:#f1f5f9;border-radius:10px;padding:3px;margin-bottom:18px}
+.toggle-btn{flex:1;padding:8px;border:none;border-radius:8px;background:transparent;font-size:13px;color:#64748b;cursor:pointer;font-weight:600;transition:all .2s}
+.toggle-btn.active{background:#fff;color:#0f172a;box-shadow:0 1px 6px rgba(0,0,0,0.10)}
+.inp{width:100%;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;color:#0f172a;background:#f8fafc;outline:none;margin-bottom:10px;transition:border .2s}
+.inp:focus{border-color:#0f172a}
+.pw-wrap{position:relative;width:100%}
+.pw-wrap .inp{padding-right:44px}
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-55%);background:none;border:none;cursor:pointer;font-size:17px}
+.err-msg{font-size:12px;color:#ef4444;margin-bottom:10px;text-align:left}
+.main-btn{width:100%;padding:13px;background:#0f172a;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .2s}
+.main-btn:hover{opacity:.88}
+.lang-toggle{padding:5px 12px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:7px;font-size:12px;font-weight:700;color:#0f172a;cursor:pointer;margin-bottom:14px;float:right}
+/* HEADER */
+.header{background:#fff;border-bottom:1px solid #e2e8f0;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.header-left .app-name{font-size:18px;font-weight:800;color:#0f172a}
+.header-left .user-badge{display:block;font-size:11px;color:#94a3b8;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:6px}
+.bal-wrap{text-align:right}
+.bal-label{display:block;font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px}
+.bal-val{font-size:15px;font-weight:800;color:#0f172a}
+.nw-bar{background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:4px 14px;display:flex;justify-content:space-between;font-size:11px;color:#64748b;gap:8px;flex-wrap:wrap}
+.nw-val{font-weight:700;color:#0f172a}
+.logout-btn{padding:4px 9px;background:none;border:1px solid #e2e8f0;border-radius:7px;font-size:10px;color:#94a3b8;cursor:pointer}
+/* TABS */
+.tab-bar{background:#fff;border-bottom:1px solid #e2e8f0;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{flex:0 0 auto;padding:10px 12px;background:none;border:none;font-size:11px;color:#64748b;cursor:pointer;white-space:nowrap;border-bottom:2.5px solid transparent;font-weight:600;transition:all .2s}
+.tab-btn.active{color:#0f172a;border-bottom-color:#0f172a;font-weight:800}
+/* BODY */
+.body{flex:1;overflow-y:auto;padding:16px}
+.center{display:flex;flex-direction:column;align-items:center;gap:16px}
+/* COMMON UI */
+.bet-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;width:100%}
+.chip{padding:6px 13px;background:#fff;border:1.5px solid #e2e8f0;border-radius:22px;font-size:12px;color:#64748b;cursor:pointer;font-weight:600;transition:all .2s}
+.chip.active{background:#0f172a;color:#fff;border-color:#0f172a}
+.action-btn{padding:11px 28px;background:#0f172a;color:#fff;border:none;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;transition:opacity .2s}
+.action-btn:disabled{opacity:.4;cursor:not-allowed}
+.section-title{font-size:17px;font-weight:800;color:#0f172a;margin-bottom:12px}
+.card-box{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:16px}
+/* EARN */
+.earn-btn{width:140px;height:140px;border-radius:50%;background:#0f172a;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;box-shadow:0 8px 32px rgba(15,23,42,0.20);transition:transform .1s;user-select:none}
+.earn-btn:active{transform:scale(.91)}
+.stat-row{display:flex;gap:12px;width:100%}
+.stat-box{flex:1;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;text-align:center}
+.stat-val{font-size:17px;font-weight:800;color:#0f172a}
+.stat-key{font-size:11px;color:#94a3b8;margin-top:2px}
+/* SLOT */
+.reel-box{display:flex;gap:8px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:18px 22px}
+.reel{width:62px;height:72px;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:34px}
+.win-badge{background:#dcfce7;color:#16a34a;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:800}
+.pay-table{width:100%;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px}
+.pay-title{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:700}
+.pay-row{display:flex;align-items:center;padding:4px 0;border-bottom:1px solid #f1f5f9;font-size:12px}
+.pay-combo{flex:0 0 100px;font-size:14px}
+.pay-label{flex:1;color:#64748b}
+.pay-mult{font-weight:800;color:#0f172a}
+/* ROULETTE */
+.roulette-result{font-size:14px;font-weight:700;color:#0f172a;min-height:20px;text-align:center}
+.choice-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;width:100%}
+/* UpDown Cards */
+.ud-playing-card{background:#fff;border-radius:12px;border:2px solid #e2e8f0;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.10);user-select:none;flex-shrink:0}
+.ud-card-big{width:105px;height:148px}
+.ud-card-small{width:68px;height:96px}
+.ud-empty{background:#f1f5f9;border:2px dashed #e2e8f0}
+.ud-card-corner{position:absolute;font-size:12px;font-weight:800;line-height:1.2;text-align:center}
+.ud-card-tl{top:7px;left:9px}
+.ud-card-br{bottom:7px;right:9px;transform:rotate(180deg)}
+.ud-card-center{font-size:42px}
+.ud-card-small .ud-card-corner{font-size:10px}
+.ud-card-small .ud-card-center{font-size:24px}
+.ud-cards-row{display:flex;align-items:center;gap:14px;justify-content:center;width:100%}
+.ud-arrow{font-size:26px;color:#94a3b8;font-weight:900}
+.ud-card-label{font-size:10px;color:#94a3b8;text-align:center;margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.ud-result-badge{padding:7px 18px;border-radius:18px;font-size:14px;font-weight:800;min-height:34px;text-align:center}
+.ud-btns{display:flex;gap:8px;width:100%}
+.ud-btn{flex:1;padding:11px 0;border:none;border-radius:10px;color:#fff;font-weight:800;font-size:12px;cursor:pointer}
+/* BACCARAT */
+.bacc-section{width:100%}
+.bacc-label{font-size:11px;color:#94a3b8;margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.card-row{display:flex;gap:7px;flex-wrap:wrap}
+.card{width:50px;height:68px;background:#fff;border:1.5px solid #e2e8f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+.card.red{color:#ef4444}.card.black{color:#1e293b}
+/* MARKET */
+.market-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gem-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px}
+.gem-emoji{font-size:24px;margin-bottom:4px}
+.gem-name{font-size:11px;color:#64748b;margin-bottom:1px;font-weight:600}
+.gem-price{font-size:17px;font-weight:800;color:#0f172a}
+.gem-owned{font-size:11px;color:#94a3b8;margin:4px 0 6px}
+.gem-btns{display:flex;gap:5px}
+.gem-btn{flex:1;padding:6px 0;border:none;border-radius:7px;color:#fff;font-size:11px;font-weight:700;cursor:pointer}
+/* SHOP / ITEMS */
+.shop-tier-title{font-size:12px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid #f1f5f9}
+.item-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:13px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;margin-bottom:8px}
+.item-card.owned{border-color:#22c55e;background:#f0fdf4}
+.item-card.legendary{border-color:#f59e0b;background:#fffbeb}
+.item-emoji{font-size:30px;flex-shrink:0}
+.item-info{flex:1;min-width:0}
+.item-name{font-size:13px;font-weight:800;color:#0f172a}
+.item-desc{font-size:11px;color:#64748b;margin:2px 0 5px;line-height:1.4}
+.item-effect{font-size:10px;color:#7c3aed;font-weight:700;background:#ede9fe;padding:2px 7px;border-radius:8px;display:inline-block;margin-bottom:5px}
+.item-price{font-size:14px;font-weight:800;color:#0f172a}
+.item-buy-btn{padding:7px 14px;border:none;border-radius:8px;background:#0f172a;color:#fff;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;align-self:center}
+.item-buy-btn:disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed}
+.item-buy-btn.active-btn{background:#22c55e}
+/* BANK */
+.bank-card{background:linear-gradient(135deg,#1e3a5f,#0f172a);border-radius:16px;padding:22px;color:#fff;margin-bottom:14px}
+.bank-balance{font-size:28px;font-weight:900;margin:6px 0 2px}
+.bank-interest{font-size:12px;color:#93c5fd}
+.bank-input{width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;background:#f8fafc;outline:none;margin-bottom:8px}
+.bank-btns{display:flex;gap:8px}
+.bank-btn{flex:1;padding:11px 0;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer}
+/* INVENTORY */
+.inv-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.inv-slot{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:8px 4px;text-align:center;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;position:relative;cursor:pointer;transition:border .2s}
+.inv-slot:hover{border-color:#94a3b8}
+.inv-slot.empty{opacity:.4}
+.inv-slot-emoji{font-size:22px}
+.inv-slot-name{font-size:9px;color:#64748b;font-weight:600;line-height:1.2;text-align:center}
+.inv-slot-qty{position:absolute;top:3px;right:5px;font-size:10px;font-weight:800;color:#0f172a}
+.inv-slot-val{font-size:9px;color:#22c55e;font-weight:700}
+/* TITLE */
+.title-badge{display:inline-block;font-size:10px;font-weight:800;padding:2px 7px;border-radius:8px;margin-left:4px;vertical-align:middle;letter-spacing:.5px}
+/* UNDERGROUND */
+.underground-bg{background:linear-gradient(135deg,#0a0a0f,#1a0a2e);border-radius:16px;padding:20px;color:#fff;margin-bottom:12px}
+.underground-title{font-size:20px;font-weight:900;color:#c084fc;margin-bottom:4px}
+.ug-btn{padding:12px 0;border:none;border-radius:11px;color:#fff;font-weight:800;font-size:13px;cursor:pointer;width:100%;margin-bottom:8px}
+/* IMPACT FLOAT */
+.money-float{position:fixed;font-size:18px;font-weight:900;pointer-events:none;z-index:9999;transition:all .8s ease-out;opacity:1}
+/* RANK */
+.rank-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.rank-title{font-size:18px;font-weight:800;color:#0f172a}
+.rank-my{font-size:12px;color:#64748b;margin-top:2px}
+.rank-list{display:flex;flex-direction:column;gap:7px}
+.rank-row{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:10px}
+.rank-row.me{border-color:#0f172a;background:#fff}
+.rank-medal{font-size:18px;width:28px}
+.rank-name{flex:1;font-size:13px;font-weight:700;color:#0f172a}
+.rank-val{font-size:13px;font-weight:800;color:#0f172a}
+/* TOAST & POPUP */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:24px;color:#fff;font-weight:700;font-size:13px;white-space:nowrap;z-index:9998;box-shadow:0 4px 18px rgba(0,0,0,0.16);opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center}
+#toast.show{opacity:1}
+#title-popup{position:fixed;top:68px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:11px 22px;border-radius:14px;font-size:13px;font-weight:700;z-index:9997;opacity:0;transition:opacity .4s;pointer-events:none;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.2)}
+#title-popup.show{opacity:1}
+
+/* LOADING OVERLAY */
+#loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .5s}
+#loading-overlay.show{opacity:1;pointer-events:all}
+.loading-text{color:#c084fc;font-size:18px;font-weight:800;margin-top:20px;letter-spacing:2px}
+.loading-sub{color:#7c3aed;font-size:12px;margin-top:8px;text-align:center;padding:0 20px}
+.loading-spinner{width:48px;height:48px;border:4px solid #1a0a2e;border-top:4px solid #c084fc;border-radius:50%;animation:spin .8s linear infinite}
+.loading-warn{color:#fbbf24;font-size:13px;font-weight:700;margin-top:16px;background:#1a1200;border:1px solid #fbbf24;padding:8px 18px;border-radius:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* MAIL */
+.mail-item{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:8px;position:relative}
+.mail-item.unread{border-color:#3b82f6;background:#eff6ff}
+.mail-badge{position:absolute;top:8px;right:10px;background:#ef4444;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:8px}
+/* DEV PANEL */
+.dev-panel{background:#0f172a;color:#e2e8f0;min-height:100vh;padding:16px}
+.dev-title{font-size:20px;font-weight:900;color:#fbbf24;margin-bottom:16px}
+.dev-section{background:#1e293b;border-radius:12px;padding:14px;margin-bottom:12px}
+.dev-section-title{font-size:12px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.dev-inp{width:100%;padding:9px 12px;background:#0f172a;border:1.5px solid #334155;border-radius:8px;color:#e2e8f0;font-size:13px;outline:none;margin-bottom:8px}
+.dev-btn{padding:8px 16px;background:#fbbf24;color:#0f172a;border:none;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;margin:3px}
+.dev-btn.red{background:#ef4444;color:#fff}
+.dev-btn.green{background:#22c55e;color:#fff}
+.dev-btn.blue{background:#3b82f6;color:#fff}
+.dev-btn.purple{background:#8b5cf6;color:#fff}
+.user-row{display:flex;align-items:center;gap:8px;padding:8px;background:#0f172a;border-radius:8px;margin-bottom:6px}
+
+/* BOARD */
+.board-post{background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:10px}
+.board-post-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.board-post-author{font-size:13px;font-weight:800;color:#0f172a}
+.board-post-time{font-size:11px;color:#94a3b8}
+.board-post-body{font-size:13px;color:#334155;line-height:1.6;word-break:break-all;white-space:pre-wrap}
+.board-post-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.board-like-btn{padding:4px 12px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:20px;font-size:12px;cursor:pointer;font-weight:700;color:#64748b;transition:all .2s}
+.board-like-btn.liked{background:#fee2e2;border-color:#fca5a5;color:#ef4444}
+.board-del-btn{padding:4px 10px;background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;font-size:11px;cursor:pointer;color:#ef4444;font-weight:700}
+.board-write-box{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:14px}
+.board-inp{width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;background:#fff;outline:none;margin-bottom:8px;resize:vertical;font-family:inherit;color:#0f172a}
+.board-inp:focus{border-color:#0f172a}
+</style>
+</head>
+<body>
+<div id="login-screen">
+  <div class="login-card">
+    <button class="lang-toggle" onclick="toggleLang()">EN</button>
+    <div style="clear:both"></div>
+    <div class="login-logo">💰</div>
+    <div class="login-title" id="lt-title">포춘</div>
+    <div class="login-sub" id="lt-sub">벌고, 예측하고, 수집하세요</div>
+    <div class="toggle-row">
+      <button class="toggle-btn active" id="btn-login" onclick="setMode('login')">로그인</button>
+      <button class="toggle-btn" id="btn-register" onclick="setMode('register')">회원가입</button>
+    </div>
+    <input class="inp" id="inp-name" placeholder="닉네임" maxlength="16"/>
+    <div class="pw-wrap">
+      <input class="inp" id="inp-pw" placeholder="비밀번호" type="password" maxlength="32" onkeydown="if(event.key==='Enter')doAuth()"/>
+      <button class="eye-btn" onclick="togglePw()">👁️</button>
+    </div>
+    <div class="err-msg" id="auth-err"></div>
+    <button class="main-btn" id="lt-btn" onclick="doAuth()">로그인 →</button>
+  </div>
+</div>
+<div id="app" style="display:none">
+  <div class="header">
+    <div class="header-left">
+      <span class="app-name">Fortune</span>
+      <span class="user-badge" id="h-user"></span>
+    </div>
+    <div class="header-right">
+      <button class="lang-toggle" style="margin:0" onclick="toggleLang()">EN</button>
+      <div class="bal-wrap">
+        <span class="bal-label">잔액</span>
+        <span class="bal-val" id="h-money">$0</span>
+      </div>
+      <button class="logout-btn" onclick="exportSave()" title="모든 계정 데이터를 파일로 백업">💾 백업</button>
+      <button class="logout-btn" onclick="document.getElementById('import-file').click()" title="백업 파일에서 복원">📂 복원</button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importSave(event)"/>
+      <button class="logout-btn" onclick="logout()">로그아웃</button>
+    </div>
+  </div>
+  <div class="nw-bar">
+    <span>순자산 <b class="nw-val" id="h-nw">$0</b></span>
+    <span>은행 <b class="nw-val" id="h-bank">$0</b></span>
+    <span>효과 <b class="nw-val" id="h-effects">없음</b></span>
+  </div>
+  <div class="tab-bar" id="tab-bar"></div>
+  <div class="body" id="main-body"></div>
+</div>
+<div id="toast"></div>
+
+<div id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="lo-text">지하로 내려가는 중...</div>
+  <div class="loading-sub" id="lo-sub">⚠️ 도둑을 조심하세요!</div>
+  <div class="loading-warn">💀 소지금을 잃을 수 있습니다</div>
+</div>
+
+<div id="title-popup"></div>
+<script>
+
+// ═══ SUPABASE ═══════════════════════════════════════════════
+const SUPA_URL='https://kdnfzqxldvwluprtwydx.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkbmZ6cXhsZHZ3bHVwcnR3eWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NTM1MjMsImV4cCI6MjA5NjAyOTUyM30.jMvGdcHfJx9eNS8V39B0CT-9VpKWKuydZWMvXVPVhuA';
+async function _db(method,table,body,qs){
+  try{
+    const r=await fetch(SUPA_URL+'/rest/v1/'+table+(qs||''),{
+      method,
+      headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=representation'},
+      body:body?JSON.stringify(body):undefined
+    });
+    if(!r.ok)return null;
+    const t=await r.text();return t?JSON.parse(t):null;
+  }catch(e){return null;}
+}
+// Shared gem+stock prices (all users see same prices)
+async function loadSharedPrices(){
+  const r=await _db('GET','users',null,'?id=eq.__prices__&select=data');
+  if(r&&r[0]&&r[0].data){
+    const d=r[0].data;
+    GEM_BASE.forEach(g=>{if(d['g_'+g.id])gemPrices[g.id]=d['g_'+g.id];});
+    if(typeof STOCK_LIST!=='undefined')STOCK_LIST.forEach(s=>{if(d['s_'+s.id]){stockPrices[s.id]=d['s_'+s.id];if(stockHistory[s.id])stockHistory[s.id].push(d['s_'+s.id]);}});
+  }
+}
+async function saveSharedPrices(){
+  const d={};
+  GEM_BASE.forEach(g=>d['g_'+g.id]=gemPrices[g.id]);
+  if(typeof STOCK_LIST!=='undefined')STOCK_LIST.forEach(s=>d['s_'+s.id]=stockPrices[s.id]);
+  _db('POST','users',{id:'__prices__',data:d,updated_at:new Date().toISOString()},'?on_conflict=id');
+}
+// User save/load
+async function supaLoad(name){
+  const r=await _db('GET','users',null,'?id=eq.'+encodeURIComponent(name)+'&select=data');
+  if(r&&r[0]&&r[0].data){
+    const d=r[0].data;
+    money=d.money||0;bankMoney=d.bankMoney||0;inventory=d.inventory||{};
+    activeEffects=d.activeEffects||{};userTitles=d.userTitles||[];activeTitle=d.activeTitle||null;
+    hasTicket=!!d.hasTicket;inUnderground=!!d.inUnderground;normalWorkers=d.normalWorkers||0;
+    underWorkers=d.underWorkers||0;xDrugQty=d.xDrugQty||0;gemBuyPrices=d.gemBuyPrices||{};
+    if(typeof stockHoldings!=='undefined')stockHoldings=d.stockHoldings||{};
+    if(typeof loanAmount!=='undefined')loanAmount=d.loanAmount||0;
+    try{localStorage.setItem('fdata_'+name,JSON.stringify(d));}catch(e){}
+    return true;
+  }
+  const loc=localStorage.getItem('fdata_'+name);
+  if(loc){try{const d=JSON.parse(loc);money=d.money||0;bankMoney=d.bankMoney||0;inventory=d.inventory||{};}catch(e){}return true;}
+  return false;
+}
+async function supaSave(){
+  if(!currentUser)return;
+  const d={money,bankMoney,inventory,activeEffects,userTitles,activeTitle,hasTicket,inUnderground,
+    normalWorkers,underWorkers,xDrugQty,gemBuyPrices,
+    stockHoldings:(typeof stockHoldings!=='undefined'?stockHoldings:{}),
+    loanAmount:(typeof loanAmount!=='undefined'?loanAmount:0)};
+  try{localStorage.setItem('fdata_'+currentUser,JSON.stringify(d));}catch(e){}
+  _db('POST','users',{id:currentUser,data:d,updated_at:new Date().toISOString()},'?on_conflict=id');
+}
+async function supaRegister(n,h){
+  const e=await _db('GET','users',null,'?id=eq.acc_'+encodeURIComponent(n)+'&select=id');
+  if(e&&e.length)return false;
+  await _db('POST','users',{id:'acc_'+n,data:{pw:h},updated_at:new Date().toISOString()},'?on_conflict=id');
+  try{localStorage.setItem('facc_'+n,JSON.stringify({pw:h}));}catch(e){}
+  return true;
+}
+async function supaGetAccount(n){
+  try{const c2=localStorage.getItem('facc_'+n);if(c2)return JSON.parse(c2);}catch(e){}
+  const r=await _db('GET','users',null,'?id=eq.acc_'+encodeURIComponent(n)+'&select=data');
+  if(r&&r[0]){try{localStorage.setItem('facc_'+n,JSON.stringify(r[0].data));}catch(e){}return r[0].data;}
+  return null;
+}
+// Rankings
+async function supaGetRankings(){
+  const rows=await _db('GET','users',null,"?id=not.like.acc_*&id=not.like.__*&select=id,data&order=updated_at.desc&limit=200")||[];
+  return rows.filter(r=>r.data&&typeof r.data.money==='number'&&r.id!=='개발자').map(r=>{
+    const d=r.data,nw=(d.money||0)+(d.bankMoney||0);
+    const ti=(d.activeTitle?TITLES.find(x=>x.id===d.activeTitle):null)||TITLES.filter(x=>(d.userTitles||[]).includes(x.id)).pop()||null;
+    return{name:r.id,money:d.money||0,bank:d.bankMoney||0,nw:Math.round(nw),title:ti};
+  }).sort((a,b)=>b.nw-a.nw);
+}
+// Dev: delete user
+async function supaDeleteUser(name){
+  await _db('DELETE','users',null,'?id=eq.'+encodeURIComponent(name));
+  await _db('DELETE','users',null,'?id=eq.acc_'+encodeURIComponent(name));
+  try{localStorage.removeItem('fdata_'+name);localStorage.removeItem('facc_'+name);}catch(e){}
+}
+// Dev: adjust money
+async function supaAdjustMoney(name,amount,mode){
+  const r=await _db('GET','users',null,'?id=eq.'+encodeURIComponent(name)+'&select=data');
+  const d=(r&&r[0]&&r[0].data)||{};
+  if(mode==='add')d.money=(d.money||0)+amount;
+  else if(mode==='set')d.money=amount;
+  else if(mode==='bank')d.bankMoney=(d.bankMoney||0)+amount;
+  await _db('POST','users',{id:name,data:d,updated_at:new Date().toISOString()},'?on_conflict=id');
+  if(name===currentUser){money=d.money||0;bankMoney=d.bankMoney||0;updateHUD();}
+}
+// ═══════════════════════════════════════════════════════════
+// i18n
+// ═══════════════════════════════════════════════════════════
+let lang=(function(){try{return localStorage.getItem('flang')||'ko';}catch(e){return 'ko';}})();
+
+// Safe localStorage wrapper (works on file:// in all browsers)
+var _memStore={};
+var safeLS={
+  getItem:function(k){try{return localStorage.getItem(k);}catch(e){return _memStore[k]||null;}},
+  setItem:function(k,v){try{localStorage.setItem(k,v);}catch(e){_memStore[k]=v;}},
+  removeItem:function(k){try{localStorage.removeItem(k);}catch(e){delete _memStore[k];}},
+  get length(){try{return localStorage.length;}catch(e){return Object.keys(_memStore).length;}},
+  key:function(i){try{return localStorage.key(i);}catch(e){return Object.keys(_memStore)[i]||null;}}
+};
+
+const T={
+  ko:{
+    tabs:['적립','슬롯','룰렛','업다운','바카라','동전','비트코인','마켓','주식','상점','은행','대출','인벤토리','거래소','지하상가','복권','출석','도전과제','우편','게시판','랭킹'],
+    login:'로그인',register:'회원가입',nick:'닉네임',pw:'비밀번호',loginBtn:'로그인 →',regBtn:'시작하기 →',
+    errName:'닉네임 2자 이상',errPw:'비밀번호 4자 이상',errExist:'이미 사용중',errNoUser:'없는 계정',errWrongPw:'비밀번호 틀림',
+    earnTitle:'일일 적립',earnSub:'탭 or 스페이스바 → $10',tapBtn:'탭하기',taps:'탭수',session:'세션 적립',
+    spinBtn:'스핀',spinning:'돌아가는 중…',payoutTable:'배당표',
+    betLabel:'베팅',rolling:'구르는 중…',placeBet:'베팅 선택',
+    red:'빨강',black:'검정',green:'그린(0)',even:'짝수',odd:'홀수',
+    curCard:'현재 카드',streak:'연승',prevCard:'이전',
+    higher:'▲ 높음 ×2',same:'= 같음 ×10',lower:'▼ 낮음 ×2',
+    player:'플레이어',banker:'뱅커',tie:'타이',deal:'딜',again:'다시',
+    heads:'앞면',tails:'뒷면',flip:'던지기',
+    liveMarket:'실시간 마켓',owned:'보유',buy:'구매',sell:'판매',
+    buyAt:'구매가',basePrice:'기준가',profit:'이익',loss:'손실',
+    bankTitle:'은행',bankBalance:'예금잔액',bankInterest:'연이율 0.01%/분',
+    deposit:'입금',withdraw:'출금',amount:'금액',
+    inventory:'인벤토리',totalAsset:'총 자산가치',
+    shopTitle:'상점',activeEffects:'활성 효과',titleCollection:'칭호 컬렉션',nextTitle:'다음 칭호',allTitles:'모든 칭호 획득! 🎉',
+    ugTitle:'지하상가',ugSub:'티켓을 구매해 지하로 내려가세요',ugBuyTicket:'티켓 구매 ($500,000)',ugEnter:'입장 시도 (성공률 60%)',ugWork:'지하 작업 (+$100, 도둑 위험)',ugShop:'지하 상점',ugBack:'지상으로 올라가기',
+    ugTicketBought:'티켓 구매 완료!',ugEnterSuccess:'지하상가 입장 성공! 🎉',ugEnterFail:'입장 실패... 티켓 소멸 💀',ugStolen:'도둑에게 소지금을 털렸다! 💸',ugWorkSuccess:'+$100 획득!',
+    xDrug:'X약',xDrugDesc:'비밀 물질. 일반 상점 2배 / 수상한 상인 50% 확률 3배 or 0.5배',
+    sellNormal:'일반 상점 판매 (×2)',sellSuspect:'수상한 상인 판매 (50%:×3 / 50%:×0.5)',
+    workerTitle:'일꾼',workerDesc:'자동으로 일하고 은행에 입금',workerNormal:'지상 일꾼',workerUnder:'지하 일꾼',workerBuy:'고용',workerFire:'해고',workerCount:'일꾼 수',
+    low:'잔액 부족!',win:'+$',lose:'-$',logout:'로그아웃',me:'(나)',
+    leaderboard:'리더보드',yourNW:'내 순자산',noScores:'아직 없어요',
+    payLabels:['잭팟','그랜드','스타','체리','포도','레몬','💎2개','7️⃣2개','🍒2개'],
+    gemNames:{dia:'다이아몬드',rub:'루비',eme:'에메랄드',sap:'사파이어',ame:'자수정',gld:'금괴',per:'진주',opa:'오팔',pla:'플래티넘',drg:'용의 보석'},
+    itemNames:{work2x:'일 효율 포션',work5x:'초강력 노동 포션',lucky:'행운의 클로버',mega:'메가 럭 포션',shield:'패배 보호막',shield3:'트리플 보호막',double:'더블 찬스',timewarp:'타임워프',btcbust:'비트코인 부스터',godhand:'신의 손',eternal:'무한의 반지'},
+    itemDescs:{work2x:'탭당 $10→$20 (5분)',work5x:'탭당 $10→$50 (3분)',lucky:'도박 배당 +20% (3분)',mega:'도박 배당 +50% (2분)',shield:'다음 패배 1회 환불',shield3:'다음 패배 3회 환불',double:'슬롯 잭팟 확률 2배 (5분)',timewarp:'5초마다 자동 $100 (2분)',btcbust:'BTC 배당 ×2.5 (10분)',godhand:'모든 도박 배당 ×3 (2분)',eternal:'탭당 $200 영구'},
+  },
+  en:{
+    tabs:['Earn','Spin','Wheel','Predict','Baccarat','Coin','Bitcoin','Market','Stocks','Shop','Bank','Loan','Inventory','Exchange','Underground','Lottery','Attendance','Quests','Mail','Board','Ranks'],
+    login:'Login',register:'Register',nick:'Nickname',pw:'Password',loginBtn:'Login →',regBtn:'Get Started →',
+    errName:'2+ chars',errPw:'4+ chars',errExist:'Taken',errNoUser:'Not found',errWrongPw:'Wrong password',
+    earnTitle:'Daily Earnings',earnSub:'Tap or Space → $10',tapBtn:'Tap to Earn',taps:'Taps',session:'Session',
+    spinBtn:'Spin',spinning:'Spinning…',payoutTable:'Payout Table',
+    betLabel:'Bet',rolling:'Rolling…',placeBet:'Place your bet',
+    red:'Red',black:'Black',green:'Green(0)',even:'Even',odd:'Odd',
+    curCard:'Current Card',streak:'streak',prevCard:'Prev',
+    higher:'▲ Higher ×2',same:'= Same ×10',lower:'▼ Lower ×2',
+    player:'Player',banker:'Banker',tie:'Tie',deal:'Deal',again:'Again',
+    heads:'Heads',tails:'Tails',flip:'Flip',
+    liveMarket:'Live Market',owned:'Owned',buy:'Buy',sell:'Sell',
+    buyAt:'Buy price',basePrice:'Base',profit:'Profit',loss:'Loss',
+    bankTitle:'Bank',bankBalance:'Savings',bankInterest:'0.01% interest/min',
+    deposit:'Deposit',withdraw:'Withdraw',amount:'Amount',
+    inventory:'Inventory',totalAsset:'Total Asset Value',
+    shopTitle:'Shop',activeEffects:'Active Effects',titleCollection:'Titles',nextTitle:'Next title',allTitles:'All titles earned! 🎉',
+    ugTitle:'Underground',ugSub:'Buy a ticket to go underground',ugBuyTicket:'Buy Ticket ($500,000)',ugEnter:'Enter (60% success)',ugWork:'Underground Work (+$100, theft risk)',ugShop:'Underground Shop',ugBack:'Return to surface',
+    ugTicketBought:'Ticket purchased!',ugEnterSuccess:'Entered underground! 🎉',ugEnterFail:'Entry failed... ticket gone 💀',ugStolen:'Stolen! Lost your cash! 💸',ugWorkSuccess:'+$100 earned!',
+    xDrug:'X-Drug',xDrugDesc:'Secret substance. Normal shop ×2 / Suspicious merchant 50%:×3 or 50%:×0.5',
+    sellNormal:'Sell at normal shop (×2)',sellSuspect:'Suspicious merchant (50%:×3 / 50%:×0.5)',
+    workerTitle:'Workers',workerDesc:'Auto-work and deposit to bank',workerNormal:'Surface Worker',workerUnder:'Underground Worker',workerBuy:'Hire',workerFire:'Fire',workerCount:'Workers',
+    low:'Not enough!',win:'+$',lose:'-$',logout:'Logout',me:'(me)',
+    leaderboard:'Leaderboard',yourNW:'Your net worth',noScores:'No scores yet',
+    payLabels:['JACKPOT','Grand','Star','Cherry','Grape','Lemon','2x💎','2x7️⃣','2x🍒'],
+    gemNames:{dia:'Diamond',rub:'Ruby',eme:'Emerald',sap:'Sapphire',ame:'Amethyst',gld:'Gold Bar',per:'Pearl',opa:'Opal',pla:'Platinum',drg:'Dragon Gem'},
+    itemNames:{work2x:'Work Boost',work5x:'Power Grind',lucky:'Lucky Clover',mega:'Mega Luck',shield:'Loss Shield',shield3:'Triple Shield',double:'Double Chance',timewarp:'Time Warp',btcbust:'BTC Booster',godhand:"God's Hand",eternal:'Eternal Ring'},
+    itemDescs:{work2x:'$10→$20/tap (5min)',work5x:'$10→$50/tap (3min)',lucky:'+20% payout (3min)',mega:'+50% payout (2min)',shield:'Refund next loss',shield3:'Refund next 3 losses',double:'2x jackpot (5min)',timewarp:'Auto $100/5s (2min)',btcbust:'BTC ×2.5 (10min)',godhand:'All payout ×3 (2min)',eternal:'$200/tap PERM'},
+  }
+};
+const t=()=>T[lang];
+function toggleLang(){
+  lang=lang==='ko'?'en':'ko';
+  safeLS.setItem('flang',lang);
+  // update all lang-toggle buttons
+  document.querySelectorAll('.lang-toggle').forEach(b=>b.textContent=lang==='ko'?'EN':'한');
+  // if in login screen, update text
+  const ltTitle=document.getElementById('lt-title');
+  if(ltTitle){
+    ltTitle.textContent=lang==='ko'?'포춘':'Fortune';
+    document.getElementById('lt-sub').textContent=lang==='ko'?'벌고, 예측하고, 수집하세요':'Earn, Predict & Collect';
+    document.getElementById('btn-login').textContent=T[lang].login;
+    document.getElementById('btn-register').textContent=T[lang].register;
+    document.getElementById('inp-name').placeholder=T[lang].nick;
+    document.getElementById('inp-pw').placeholder=T[lang].pw;
+    document.getElementById('lt-btn').textContent=T[lang].loginBtn;
+  }
+  // if logged in, rebuild tabs and re-render current tab
+  if(currentUser){
+    buildTabs();
+    updateHUD();
+    switchTab(currentTab);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════
+let authMode='login';
+function setMode(m){authMode=m;document.getElementById('btn-login').classList.toggle('active',m==='login');document.getElementById('btn-register').classList.toggle('active',m==='register');document.getElementById('auth-err').textContent='';document.getElementById('lt-btn').textContent=m==='login'?t().loginBtn:t().regBtn;}
+function togglePw(){const i=document.getElementById('inp-pw');i.type=i.type==='password'?'text':'password';}
+function hashPw(pw){let h=0;for(let c of pw)h=(Math.imul(31,h)+c.charCodeAt(0))|0;return h.toString(36);}
+async function doAuth(){
+  const name=document.getElementById('inp-name').value.trim();
+  const pw=document.getElementById('inp-pw').value;
+  const err=document.getElementById('auth-err');
+  if(name.length<2){err.textContent=t().errName;return;}
+  if(pw.length<4){err.textContent=t().errPw;return;}
+  const btn=document.getElementById('lt-btn');
+  if(btn){btn.disabled=true;btn.textContent='⏳ 연결 중...';}
+  if(authMode==='register'){
+    const ok=await supaRegister(name,hashPw(pw));
+    if(!ok){err.textContent=t().errExist;if(btn){btn.disabled=false;btn.textContent=t().regBtn;}return;}
+  }else{
+    const acc=await supaGetAccount(name);
+    if(!acc){err.textContent=t().errNoUser;if(btn){btn.disabled=false;btn.textContent=t().loginBtn;}return;}
+    if(acc.pw!==hashPw(pw)){err.textContent=t().errWrongPw;if(btn){btn.disabled=false;btn.textContent=t().loginBtn;}return;}
+  }
+  initDevAccount();currentUser=name;
+  try{localStorage.setItem('fsession',name);}catch(e){}
+  await supaLoad(name);
+  await loadSharedPrices();
+  startApp();
+}
+function logout(){safeLS.removeItem('fsession');location.reload();}
+function exportSave(){
+  const dump={};
+  for(let i=0;i<safeLS.length;i++){
+    const k=safeLS.key(i);
+    if(k&&(k.startsWith('fdata_')||k.startsWith('facc_')||k.startsWith('fsession')||k.startsWith('fbtc')||k.startsWith('fbtchist')||k.startsWith('fmail_')||k.startsWith('fboard'))){
+      dump[k]=safeLS.getItem(k);
+    }
+  }
+  const blob=new Blob([JSON.stringify({_type:'fortune-backup',_date:new Date().toISOString(),data:dump},null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='fortune-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  showToast('💾 백업 완료!','win');
+}
+function importSave(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const j=JSON.parse(r.result);
+      if(j._type!=='fortune-backup'){alert('올바른 백업 파일이 아닙니다.');return;}
+      if(!confirm('현재 데이터를 백업 파일로 덮어씁니다. 계속하시겠습니까?'))return;
+      Object.keys(j.data).forEach(k=>safeLS.setItem(k,j.data[k]));
+      alert('✅ 복원 완료! 페이지를 새로고침합니다.');
+      location.reload();
+    }catch(err){alert('파일을 읽을 수 없습니다: '+err.message);}
+  };
+  r.readAsText(f);
+  e.target.value='';
+}
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let currentUser=null,money=0,bankMoney=0,inventory={},items={},gemPrices={},activeEffects={},userTitles=[],activeTitle=null,tapCount=0,currentTab=0,hasTicket=false,inUnderground=false,normalWorkers=0,underWorkers=0,xDrugQty=0;
+let gemBuyPrices={}; // track what price each gem was bought at (average)
+// NEW: stocks/loan/lottery/attendance/quests state
+let stocks={}, stockBuyPrices={}, loanAmount=0, loanTakenAt=0, attendance={last:null,streak:0,claimedToday:false}, questProgress={taps:0,gambleWins:0,gambleBets:0,totalEarned:0}, questClaimed=[], lotteryTickets=[];
+let buyQty=1;
+function setBuyQty(v){const n=Math.max(1,Math.min(99999,parseInt(v)||1));buyQty=n;const el=document.getElementById('buyQtyInput');if(el&&el.value!=String(n))el.value=n;}
+function bumpBuyQty(d){setBuyQty(buyQty+d);if(currentTab===9)renderShop();else if(currentTab===7)renderMarket();}
+function buyQtyBar(){return `<div style="display:flex;align-items:center;gap:6px;background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:10px;padding:8px;margin-bottom:10px">
+  <div style="font-size:11px;font-weight:700;color:#64748b">수량</div>
+  <button onclick="bumpBuyQty(-10)" style="padding:4px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#fff;font-weight:700;cursor:pointer">-10</button>
+  <button onclick="bumpBuyQty(-1)" style="padding:4px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#fff;font-weight:700;cursor:pointer">-1</button>
+  <input id="buyQtyInput" type="number" min="1" value="${buyQty}" oninput="setBuyQty(this.value)" style="flex:1;min-width:50px;text-align:center;padding:5px;border:1.5px solid #cbd5e1;border-radius:6px;font-weight:800;font-size:14px">
+  <button onclick="bumpBuyQty(1)" style="padding:4px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#fff;font-weight:700;cursor:pointer">+1</button>
+  <button onclick="bumpBuyQty(10)" style="padding:4px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#fff;font-weight:700;cursor:pointer">+10</button>
+  <button onclick="setBuyQty(1);if(currentTab===9)renderShop();else if(currentTab===7)renderMarket();" style="padding:4px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#fff;font-weight:700;cursor:pointer">초기화</button>
+</div>`;}
+
+const GEM_BASE=[
+  {id:'dia',emoji:'💎',base:120000,vol:.07},{id:'rub',emoji:'🔴',base:55000,vol:.11},
+  {id:'eme',emoji:'🟢',base:42000,vol:.13},{id:'sap',emoji:'🔵',base:35000,vol:.10},
+  {id:'ame',emoji:'🟣',base:22000,vol:.17},{id:'gld',emoji:'🟡',base:80000,vol:.06},
+  {id:'per',emoji:'⚪',base:15000,vol:.19},{id:'opa',emoji:'🌈',base:11000,vol:.21},
+  {id:'pla',emoji:'🩶',base:95000,vol:.08},{id:'drg',emoji:'🐉',base:280000,vol:.05},
+];
+
+const ITEM_DEFS=[
+  {id:'work2x', tier:'common',    emoji:'⚡', effect:'earnx2',   duration:300, price:500000},
+  {id:'work5x', tier:'rare',      emoji:'🔥', effect:'earnx5',   duration:180, price:3000000},
+  {id:'lucky',  tier:'common',    emoji:'🍀', effect:'lucky',    duration:180, price:800000},
+  {id:'mega',   tier:'rare',      emoji:'🌟', effect:'meglucky', duration:120, price:5000000},
+  {id:'shield', tier:'common',    emoji:'🛡️', effect:'shield',   duration:0,   price:2000000},
+  {id:'shield3',tier:'rare',      emoji:'💠', effect:'shield3',  duration:0,   price:8000000},
+  {id:'double', tier:'epic',      emoji:'✨', effect:'slotx2',   duration:300, price:20000000},
+  {id:'timewarp',tier:'epic',     emoji:'⏰', effect:'autowarp', duration:120, price:15000000},
+  {id:'btcbust',tier:'epic',      emoji:'₿',  effect:'btcboost', duration:600, price:30000000},
+  {id:'godhand',tier:'legendary', emoji:'🤲', effect:'godhand',  duration:120, price:100000000},
+  {id:'eternal',tier:'legendary', emoji:'♾️', effect:'earnperm', duration:-1,  price:500000000},
+];
+const WORKER_NORMAL_PRICE=50000000;
+const WORKER_UNDER_PRICE=200000000;
+const X_DRUG_PRICE=10000000;
+const TICKET_PRICE=500000;
+
+const TITLES=[
+  {id:'t0',threshold:100000,     emoji:'🌱',ko:'새싹',     en:'Sprout',      color:'#16a34a',bg:'#dcfce7'},
+  {id:'t1',threshold:1000000,    emoji:'💰',ko:'부자',      en:'Rich',        color:'#ca8a04',bg:'#fef9c3'},
+  {id:'t2',threshold:10000000,   emoji:'💎',ko:'다이아',    en:'Diamond',     color:'#2563eb',bg:'#dbeafe'},
+  {id:'t3',threshold:100000000,  emoji:'👑',ko:'왕',        en:'King',        color:'#7c3aed',bg:'#ede9fe'},
+  {id:'t4',threshold:1000000000, emoji:'🔱',ko:'황제',      en:'Emperor',     color:'#dc2626',bg:'#fee2e2'},
+  {id:'t5',threshold:1e10,       emoji:'🌌',ko:'우주지배자',en:'Cosmos Lord', color:'#0f172a',bg:'#f1f5f9'},
+];
+
+function netWorth(){return money+bankMoney+GEM_BASE.reduce((s,g)=>s+(inventory[g.id]||0)*gemPrices[g.id],0)+xDrugQty*X_DRUG_PRICE+stockValue()-loanOwed();}
+function save(){supaSave();}));
+}
+function load(){GEM_BASE.forEach(g=>{gemPrices[g.id]=parseFloat(localStorage.getItem("fgem_"+g.id))||g.base;});});
+  STOCK_BASE.forEach(s=>{stockPrices[s.id]=parseFloat(safeLS.getItem('fstk_'+s.id))||s.base;});
+}
+
+// ═══════════════════════════════════════════════════════════
+// EFFECTS
+// ═══════════════════════════════════════════════════════════
+function hasEffect(name){const e=activeEffects[name];if(!e)return false;if(e.duration===-1)return true;return Date.now()<e.expiresAt;}
+function earnMult(){let m=1;if(hasEffect('earnperm'))return 20;if(hasEffect('earnx5'))m=Math.max(m,5);if(hasEffect('earnx2'))m=Math.max(m,2);return m;}
+function payoutMult(){let m=1;if(hasEffect('godhand'))m=Math.max(m,3);else if(hasEffect('meglucky'))m=Math.max(m,1.5);else if(hasEffect('lucky'))m=Math.max(m,1.2);return m;}
+function btcMult(){let m=1.9;if(hasEffect('btcboost'))m=Math.max(m,2.5);if(hasEffect('godhand'))m=Math.max(m,3);return m;}
+function shieldCount(){if(activeEffects.shield3&&hasEffect('shield3'))return activeEffects.shield3.qty||3;if(hasEffect('shield'))return 1;return 0;}
+function consumeShield(){if(activeEffects.shield3&&hasEffect('shield3')){activeEffects.shield3.qty=(activeEffects.shield3.qty||3)-1;if(activeEffects.shield3.qty<=0)delete activeEffects.shield3;return true;}if(hasEffect('shield')){delete activeEffects.shield;return true;}return false;}
+function activateEffect(def){
+  if(def.duration===-1)activeEffects[def.effect]={duration:-1,expiresAt:-1};
+  else if(def.effect==='shield')activeEffects.shield={duration:0,expiresAt:Infinity};
+  else if(def.effect==='shield3')activeEffects.shield3={duration:0,expiresAt:Infinity,qty:3};
+  else{const existing=activeEffects[def.effect];const base=existing&&hasEffect(def.effect)?existing.expiresAt:Date.now();activeEffects[def.effect]={duration:def.duration,expiresAt:base+def.duration*1000};}
+  if(def.effect==='autowarp'){clearInterval(warpTimer);warpTimer=setInterval(()=>{if(!hasEffect('autowarp')){clearInterval(warpTimer);return;}addMoney(100,true);},5000);}
+}
+let warpTimer=null;
+
+// ═══════════════════════════════════════════════════════════
+// MONEY IMPACT
+// ═══════════════════════════════════════════════════════════
+function floatImpact(amount,isWin){
+  const el=document.createElement('div');
+  el.className='money-float';
+  el.textContent=(isWin?'+$':'-$')+Math.abs(amount).toLocaleString();
+  const sz=Math.min(30,14+Math.log10(Math.abs(amount)+1)*4);
+  el.style.cssText='position:fixed;color:'+(isWin?'#16a34a':'#ef4444')+';top:'+(window.innerHeight/2)+'px;left:50%;transform:translateX(-50%);font-size:'+sz+'px;font-weight:900;pointer-events:none;z-index:99999;transition:none;text-shadow:0 2px 8px rgba(0,0,0,0.18)';
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    el.style.transition='top 1s ease-out, opacity 1s ease-out';
+    el.style.top=(window.innerHeight/2-130)+'px';
+    el.style.opacity='0';
+  }));
+  setTimeout(()=>el.remove(),1100);
+}
+function addMoney(amount,silent=false){money+=amount;save();updateHUD();if(!silent&&amount!==0)floatImpact(amount,amount>0);}
+function addBank(amount){bankMoney+=amount;save();updateHUD();}
+
+// ═══════════════════════════════════════════════════════════
+// HUD & TITLES
+// ═══════════════════════════════════════════════════════════
+let prevNW=0;
+function checkTitles(){
+  const nw=netWorth();
+  TITLES.forEach(ti=>{
+    if(nw>=ti.threshold&&!userTitles.includes(ti.id)){
+      userTitles.push(ti.id);
+      const top=TITLES.filter(x=>userTitles.includes(x.id)).pop();
+      activeTitle=top.id;
+      save();showTitlePopup(ti);
+    }
+  });
+  prevNW=nw;
+}
+function showTitlePopup(ti){
+  const el=document.getElementById('title-popup');
+  if(!el)return;
+  el.innerHTML=`${ti.emoji} 새 칭호 획득! <b>${lang==='ko'?ti.ko:ti.en}</b>`;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3500);
+}
+function getActiveTitle(){return activeTitle?TITLES.find(x=>x.id===activeTitle):null;}
+function updateHUD(){
+  document.getElementById('h-money').textContent='$'+money.toLocaleString();
+  document.getElementById('h-nw').textContent='$'+Math.round(netWorth()).toLocaleString();
+  document.getElementById('h-bank').textContent='$'+Math.round(bankMoney).toLocaleString();
+  // active effects summary
+  const active=ITEM_DEFS.filter(d=>hasEffect(d.effect));
+  document.getElementById('h-effects').textContent=active.length?active.map(d=>{const e=activeEffects[d.effect];const rem=e&&e.duration!==-1&&e.expiresAt&&e.expiresAt!==Infinity?Math.max(0,Math.ceil((e.expiresAt-Date.now())/1000)):null;return d.emoji+(rem!==null?rem+'s':'');}).join(' '):'없음';
+  const ti=getActiveTitle();
+  const badge=document.getElementById('h-user');
+  if(badge){if(ti)badge.innerHTML=`@${currentUser} <span class="title-badge" style="background:${ti.bg};color:${ti.color}">${ti.emoji}${lang==='ko'?ti.ko:ti.en}</span>`;else badge.textContent='@'+currentUser;}
+  checkTitles();
+}
+
+// ═══════════════════════════════════════════════════════════
+// GEM PRICE DRIFT
+// ═══════════════════════════════════════════════════════════
+setInterval(async ()=>{
+  let changed=false;
+  GEM_BASE.forEach(g=>{
+    const old=gemPrices[g.id];
+    gemPrices[g.id]=Math.max(1000,Math.round(gemPrices[g.id]*(1+(Math.random()-.5)*g.vol*2)));
+    if(gemPrices[g.id]!==old)changed=true;
+    try{localStorage.setItem('fgem_'+g.id,gemPrices[g.id]);}catch(e){}
+  });
+  if(changed)saveSharedPrices();
+  if(currentTab===7)renderMarket();
+  updateHUD();
+},4000);;
+
+// ═══════════════════════════════════════════════════════════
+// BANK INTEREST (0.01%/min)
+// ═══════════════════════════════════════════════════════════
+setInterval(()=>{
+  if(!currentUser||bankMoney<=0)return;
+  const interest=bankMoney*0.0001;
+  bankMoney+=interest;save();updateHUD();
+},60000);
+
+// ═══════════════════════════════════════════════════════════
+// WORKERS AUTO-INCOME
+// ═══════════════════════════════════════════════════════════
+setInterval(()=>{
+  if(!currentUser)return;
+  let income=0;
+  if(normalWorkers>0)income+=normalWorkers*10;
+  if(underWorkers>0)income+=underWorkers*50;
+  if(income>0){bankMoney+=income;save();updateHUD();showToast(`👷 일꾼 수입 +$${income.toLocaleString()}`,'win');}
+},10000);
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg,type='info'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.style.background=type==='win'?'#16a34a':type==='lose'?'#ef4444':'#334155';
+  el.classList.add('show');clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
+}
+
+// ═══════════════════════════════════════════════════════════
+// APP START
+// ═══════════════════════════════════════════════════════════
+async function startApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  initDevAccount();
+  load();buildTabs();switchTab(0);updateHUD();
+  document.querySelectorAll('.lang-toggle').forEach(b=>b.textContent=lang==='ko'?'EN':'한');
+  // Load shared prices from Supabase
+  await loadSharedPrices();
+  updateHUD();
+}
+function buildTabs(){
+  const bar=document.getElementById('tab-bar');bar.innerHTML='';
+  const tabs=[...t().tabs];
+  if(isDev())tabs.push('🛠️ DEV');
+  tabs.forEach((label,i)=>{const b=document.createElement('button');b.className='tab-btn'+(i===0?' active':'');b.textContent=label;b.onclick=()=>switchTab(i);bar.appendChild(b);});
+}
+const RENDERS_BASE=[renderEarn,renderSlot,renderRoulette,renderUpDown,renderBaccarat,renderCoin,renderBitcoin,renderMarket,renderStocks,renderShop,renderBank,renderLoan,renderInventory,renderExchange,renderUnderground,renderLottery,renderAttendance,renderQuests,renderMail,renderBoard,renderRanking];
+
+function switchTab(i){
+  const devTabIdx=isDev()?RENDERS_BASE.length:999;
+  if(inUnderground && i!==14 && i!==devTabIdx){
+    showToast('🚇 지하상가에서는 다른 탭을 사용할 수 없습니다. 먼저 지상으로 올라가세요.','lose');
+    document.querySelectorAll('.tab-btn').forEach((b,j)=>b.classList.toggle('active',j===14));
+    currentTab=14;
+    document.getElementById('main-body').innerHTML='';
+    renderUGInside();
+    return;
+  }
+  currentTab=i;
+  document.querySelectorAll('.tab-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+  document.getElementById('main-body').innerHTML='';
+  if(i===devTabIdx){renderDev();return;}
+  if(RENDERS_BASE[i])RENDERS_BASE[i]();
+}
+// Custom bet input helper - uses onchange (blur/Enter) to avoid focus loss while typing
+function betInput(curVal,setterName){
+  return `<div style="display:flex;gap:6px;width:100%;align-items:center;margin:4px 0">
+    <span style="font-size:12px;color:#64748b;font-weight:700">$</span>
+    <input type="number" min="1" value="${curVal}" onchange="${setterName}(Math.max(1,parseInt(this.value)||1))" onkeydown="if(event.key==='Enter')this.blur()" style="flex:1;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;background:#f8fafc;outline:none;font-weight:700;color:#0f172a"/>
+    <button class="chip" onclick="${setterName}(Math.max(1,Math.floor(money/2)))" style="padding:8px 10px;font-size:11px">½</button>
+    <button class="chip" onclick="${setterName}(Math.max(1,Math.floor(money)))" style="padding:8px 10px;font-size:11px">MAX</button>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// EARN
+// ═══════════════════════════════════════════════════════════
+function renderEarn(){
+  const m=earnMult(),perTap=10*m;
+  const b=document.getElementById('main-body');
+  b.innerHTML=`<div class="center">
+    <div class="section-title">${t().earnTitle}</div>
+    <div style="font-size:13px;color:#64748b;text-align:center">${t().earnSub}${m>1?` <b style="color:#7c3aed">(×${m})</b>`:''}</div>
+    <button class="earn-btn" id="earn-btn" onclick="doEarn()">
+      <span style="font-size:38px">💼</span>
+      <span style="font-size:13px;color:#fff;font-weight:700">${t().tapBtn}</span>
+    </button>
+    <div style="font-size:13px;color:#64748b">탭당 <b style="color:#0f172a">$${perTap.toLocaleString()}</b></div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-val" id="tap-count">${tapCount}</div><div class="stat-key">${t().taps}</div></div>
+      <div class="stat-box"><div class="stat-val" id="tap-earned">$${(tapCount*perTap).toLocaleString()}</div><div class="stat-key">${t().session}</div></div>
+    </div>
+  </div>`;
+}
+function doEarn(){
+  const m=earnMult(),earned=10*m;
+  addMoney(earned);tapCount++;
+  const cnt=document.getElementById('tap-count');if(cnt)cnt.textContent=tapCount;
+  const ear=document.getElementById('tap-earned');if(ear)ear.textContent='$'+(tapCount*10*m).toLocaleString();
+  const btn=document.getElementById('earn-btn');if(btn){btn.style.transform='scale(.91)';setTimeout(()=>btn.style.transform='',110);}
+}
+document.addEventListener('keydown',e=>{
+  // prevent page scroll on space always when in app
+  if(e.code==='Space'&&currentUser){e.preventDefault();}
+  if(e.code==='Space'&&currentUser&&currentTab===0&&!e.repeat){doEarn();}
+});
+
+// ═══════════════════════════════════════════════════════════
+// SLOT
+// ═══════════════════════════════════════════════════════════
+const SYMBOLS=['🍋','🍇','🍒','⭐','💎','7️⃣'];
+const SLOT_PAYOUTS={'7️⃣7️⃣7️⃣':50,'💎💎💎':20,'⭐⭐⭐':10,'🍒🍒🍒':5,'🍇🍇🍇':4,'🍋🍋🍋':3,'🍒🍒':2,'7️⃣7️⃣':3,'💎💎':5};
+const PAYOUT_TABLE=[{combo:'7️⃣ 7️⃣ 7️⃣',mult:50},{combo:'💎 💎 💎',mult:20},{combo:'⭐ ⭐ ⭐',mult:10},{combo:'🍒 🍒 🍒',mult:5},{combo:'🍇 🍇 🍇',mult:4},{combo:'🍋 🍋 🍋',mult:3},{combo:'💎 💎 ·',mult:5},{combo:'7️⃣ 7️⃣ ·',mult:3},{combo:'🍒 🍒 ·',mult:2}];
+function evalSlot(r){const k3=r.join('');if(SLOT_PAYOUTS[k3])return SLOT_PAYOUTS[k3];if(r[0]===r[1]&&SLOT_PAYOUTS[r[0]+r[1]])return SLOT_PAYOUTS[r[0]+r[1]];return 0;}
+let slotBet=500,slotSpinning=false,slotReels=['🍋','🍒','⭐'];
+function renderSlot(){
+  const bets=[500,1000,5000,10000,50000];
+  const b=document.getElementById('main-body');
+  b.innerHTML=`<div class="center">
+    <div class="reel-box">${slotReels.map((s,i)=>`<div class="reel" id="reel-${i}">${s}</div>`).join('')}</div>
+    <div id="slot-win" style="min-height:28px"></div>
+    ${betInput(slotBet,'setSlotBet')}
+    <div class="bet-row">${bets.map(v=>`<button class="chip${slotBet===v?' active':''}" onclick="setSlotBet(${v})">$${v.toLocaleString()}</button>`).join('')}</div>
+    <button class="action-btn" id="slot-btn" onclick="doSpin()" ${slotSpinning||money<slotBet?'disabled':''}>
+      ${slotSpinning?t().spinning:`${t().spinBtn} · $${slotBet.toLocaleString()}`}
+    </button>
+    <div class="pay-table"><div class="pay-title">${t().payoutTable}</div>
+      ${PAYOUT_TABLE.map((r,i)=>`<div class="pay-row"><span class="pay-combo">${r.combo}</span><span class="pay-label">${t().payLabels[i]}</span><span class="pay-mult">×${r.mult}</span></div>`).join('')}
+    </div>
+  </div>`;
+}
+function setSlotBet(v){slotBet=v;renderSlot();}
+function doSpin(){
+  if(slotSpinning||money<slotBet)return;
+  slotSpinning=true;addMoney(-slotBet);
+  let ticks=0;
+  const iv=setInterval(()=>{
+    slotReels=[rnd(SYMBOLS),rnd(SYMBOLS),rnd(SYMBOLS)];
+    slotReels.forEach((s,i)=>{const el=document.getElementById('reel-'+i);if(el)el.textContent=s;});
+    if(++ticks>20){
+      clearInterval(iv);
+      const mult=evalSlot(slotReels);
+      const jackpotMult=hasEffect('slotx2')?2:1;
+      if(mult>0){const won=Math.round(slotBet*mult*jackpotMult*payoutMult());addMoney(won);const el=document.getElementById('slot-win');if(el)el.innerHTML=`<div class="win-badge">✨ ×${mult} — +$${won.toLocaleString()}</div>`;}
+      else{if(shieldCount()>0){consumeShield();addMoney(slotBet);showToast('🛡️ 보호막 발동! 환불','win');}else showToast(t().lose+slotBet.toLocaleString(),'lose');}
+      slotSpinning=false;renderSlot();
+    }
+  },80);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ROULETTE
+// ═══════════════════════════════════════════════════════════
+const RED_NUMS=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+const WHEEL_ORDER=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+let roulBet=1000,roulChoice='red',roulSpinning=false,roulAngle=0;
+function renderRoulette(){
+  const bets=[1000,5000,10000,50000,100000];
+  const choices=[{id:'red',label:t().red,mult:2,bg:'#ef4444'},{id:'black',label:t().black,mult:2,bg:'#1e293b'},{id:'green',label:t().green,mult:35,bg:'#22c55e'},{id:'even',label:t().even,mult:2,bg:'#3b82f6'},{id:'odd',label:t().odd,mult:2,bg:'#8b5cf6'}];
+  const b=document.getElementById('main-body');
+  b.innerHTML=`<div class="center">
+    <div style="position:relative"><canvas id="rc" width="210" height="210" style="border-radius:50%;box-shadow:0 4px 20px rgba(0,0,0,0.13)"></canvas></div>
+    <div class="roulette-result" id="roul-result">${t().placeBet}</div>
+    <div class="choice-row">${choices.map(c=>`<button class="chip${roulChoice===c.id?' active':''}" onclick="setRC('${c.id}')" style="${roulChoice===c.id?'background:'+c.bg+';color:#fff;border-color:'+c.bg:''}">${c.label} ×${c.mult}</button>`).join('')}</div>
+    ${betInput(roulBet,'setRB')}
+    <div class="bet-row">${bets.map(v=>`<button class="chip${roulBet===v?' active':''}" onclick="setRB(${v})">$${v.toLocaleString()}</button>`).join('')}</div>
+    <button class="action-btn" id="roul-btn" onclick="doRoulette()" ${roulSpinning||money<roulBet?'disabled':''}>${roulSpinning?t().rolling:`${t().betLabel} $${roulBet.toLocaleString()}`}</button>
+  </div>`;
+  drawWheel(roulAngle,null);
+}
+function drawWheel(angle,highlight){
+  const canvas=document.getElementById('rc');if(!canvas)return;
+  const ctx=canvas.getContext('2d'),cx=105,cy=105,r=102,inner=36,step=(2*Math.PI)/37;
+  ctx.clearRect(0,0,210,210);
+  WHEEL_ORDER.forEach((num,i)=>{
+    const start=angle+i*step-Math.PI/2,end=start+step;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,start,end);ctx.closePath();
+    let fill=num===0?'#16a34a':RED_NUMS.includes(num)?'#dc2626':'#111827';
+    if(highlight===num)fill='#fbbf24';
+    ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=0.7;ctx.stroke();
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(start+step/2);ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font=`bold ${num>=10?8:10}px sans-serif`;ctx.fillText(num,r-4,3);ctx.restore();
+  });
+  ctx.beginPath();ctx.arc(cx,cy,inner,0,2*Math.PI);ctx.fillStyle='#0f172a';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,cy-r+1);ctx.lineTo(cx-6,cy-r+16);ctx.lineTo(cx+6,cy-r+16);ctx.closePath();ctx.fillStyle='#fbbf24';ctx.fill();
+}
+function animWheel(target,num,cb){
+  const start=roulAngle,diff=target-start,dur=3500,t0=performance.now();
+  function frame(now){const p=Math.min((now-t0)/dur,1),ease=1-Math.pow(1-p,3),cur=start+diff*ease;roulAngle=cur;drawWheel(cur,p===1?num:null);if(p<1)requestAnimationFrame(frame);else cb();}
+  requestAnimationFrame(frame);
+}
+function setRC(c){roulChoice=c;renderRoulette();}
+function setRB(v){roulBet=v;renderRoulette();}
+function doRoulette(){
+  if(roulSpinning||money<roulBet)return;
+  roulSpinning=true;addMoney(-roulBet);
+  const num=Math.floor(Math.random()*37);
+  const idx=WHEEL_ORDER.indexOf(num);
+  const sliceAngle=(2*Math.PI)/37;
+  const target=roulAngle+(4+Math.random()*3)*2*Math.PI+(-idx*sliceAngle-sliceAngle/2+Math.PI/2)-(roulAngle%(2*Math.PI));
+  const res=document.getElementById('roul-result');if(res)res.textContent=t().rolling;
+  animWheel(target,num,()=>{
+    const mult={red:2,black:2,green:35,even:2,odd:2}[roulChoice];
+    const win=(roulChoice==='red'&&RED_NUMS.includes(num))||(roulChoice==='black'&&num!==0&&!RED_NUMS.includes(num))||(roulChoice==='green'&&num===0)||(roulChoice==='even'&&num!==0&&num%2===0)||(roulChoice==='odd'&&num%2===1);
+    const col=num===0?'🟢':RED_NUMS.includes(num)?'🔴':'⚫';
+    if(win){const p=Math.round(roulBet*mult*payoutMult());addMoney(p);if(res)res.textContent=`${col} ${num}  +$${p.toLocaleString()}`;}
+    else{if(shieldCount()>0){consumeShield();addMoney(roulBet);if(res)res.textContent=`${col} ${num}  🛡️ 환불`;}else{if(res)res.textContent=`${col} ${num}  -$${roulBet.toLocaleString()}`;showToast(t().lose+roulBet.toLocaleString(),'lose');}}
+    roulSpinning=false;document.getElementById('roul-btn')&&(document.getElementById('roul-btn').disabled=false);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// UPDOWN (2 cards)
+// ═══════════════════════════════════════════════════════════
+const SUITS=[{sym:'♠',color:'#1e293b'},{sym:'♥',color:'#ef4444'},{sym:'♦',color:'#ef4444'},{sym:'♣',color:'#1e293b'}];
+const CVALS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+function randCard(){return{v:CVALS[Math.floor(Math.random()*13)],s:SUITS[Math.floor(Math.random()*4)]};}
+function crank(v){return CVALS.indexOf(v)+1;}
+function cardHTML(card,size){
+  if(!card)return`<div class="ud-playing-card ud-card-${size} ud-empty"></div>`;
+  return`<div class="ud-playing-card ud-card-${size}" style="color:${card.s.color}">
+    <div class="ud-card-corner ud-card-tl">${card.v}<br/>${card.s.sym}</div>
+    <div class="ud-card-center">${card.s.sym}</div>
+    <div class="ud-card-corner ud-card-br">${card.v}<br/>${card.s.sym}</div>
+  </div>`;
+}
+let udBet=10000,udCur=randCard(),udPrev=null,udStreak=0,udAnim=false,udBetLocked=false;
+function renderUpDown(){
+  const bets=[5000,10000,50000,100000,500000];
+  const b=document.getElementById('main-body');
+  b.innerHTML=`<div class="center">
+    <div style="font-size:17px;font-weight:800;color:#0f172a">${t().curCard}</div>
+    ${udStreak>0?`<div style="font-size:13px;color:#f59e0b;font-weight:700">🔥 ${udStreak} ${t().streak}</div>`:''}
+    <div class="ud-cards-row">
+      <div><div style="font-size:10px;color:#94a3b8;text-align:center;margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:1px">${t().prevCard}</div>${cardHTML(udPrev,'small')}</div>
+      <div style="font-size:24px;color:#94a3b8">→</div>
+      <div>
+        <div style="font-size:10px;color:#94a3b8;text-align:center;margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:1px">${t().curCard}</div>
+        ${cardHTML(udCur,'big')}
+        <div style="font-size:11px;color:#64748b;text-align:center;margin-top:3px">${udCur.v} ${udCur.s.sym}</div>
+      </div>
+    </div>
+    <div id="ud-result" style="min-height:32px;text-align:center"></div>
+    ${betInput(udBet,'setUDB')}
+    <div class="bet-row">${udBetLocked?`<div style='background:#fee2e2;color:#ef4444;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700'>🔒 베팅 고정: $${udBet.toLocaleString()}</div>`:bets.map(v=>`<button class='chip${udBet===v?' active':''}' onclick='setUDB(${v})'>$${v.toLocaleString()}</button>`).join('')}</div>
+    <div class="ud-btns">
+      <button class="ud-btn" style="background:#22c55e" onclick="doUD('up')">${t().higher}</button>
+      <button class="ud-btn" style="background:#64748b" onclick="doUD('same')">${t().same}</button>
+      <button class="ud-btn" style="background:#ef4444" onclick="doUD('down')">${t().lower}</button>
+    </div>
+  </div>`;
+}
+function setUDB(v){if(udBetLocked){showToast("🔒 게임 중 베팅 변경 불가!","lose");return;}udBet=v;renderUpDown();}
+function doUD(dir){
+  if(udAnim||money<udBet)return;
+  if(money<udBet){showToast(t().low,'lose');return;}
+  udBetLocked=true;  // LOCK bet once game starts
+  udAnim=true;addMoney(-udBet);
+  const next=randCard(),curR=crank(udCur.v),nextR=crank(next.v);
+  const mult=dir==='same'?10:2;
+  const ok=dir==='up'?nextR>curR:dir==='down'?nextR<curR:nextR===curR;
+  udPrev=udCur;udCur=next;renderUpDown();
+  setTimeout(()=>{
+    const el=document.getElementById('ud-result');
+    if(ok){
+      const p=Math.round(udBet*mult*(typeof payoutMult==='function'?payoutMult():1));
+      addMoney(p);udStreak++;
+      if(el){el.style.cssText='background:#dcfce7;color:#16a34a;padding:7px 18px;border-radius:18px;font-size:14px;font-weight:800';
+        el.textContent='✅ '+udPrev.v+'→'+next.v+'  +$'+p.toLocaleString();}
+      showToast('+$'+p.toLocaleString(),'win');
+    }else{
+      udStreak=0;
+      if(el){el.style.cssText='background:#fee2e2;color:#dc2626;padding:7px 18px;border-radius:18px;font-size:14px;font-weight:800';
+        el.textContent='❌ '+udPrev.v+'→'+next.v+'  -$'+udBet.toLocaleString();}
+      showToast(t().lose+udBet.toLocaleString(),'lose');
+    }
+    save();updateHUD();
+    // Unlock bet after 1.5s so user can change for next round
+    setTimeout(()=>{udBetLocked=false;renderUpDown();},1500);
+    setTimeout(()=>{udAnim=false;},400);
+  },180);
+}
+function setUDB(v){if(udBetLocked){showToast("🔒 게임 중 베팅 변경 불가!","lose");return;}udBet=v;renderUpDown();}
+function doUD(dir){
+  if(udAnim||money<udBet)return;
+  if(money<udBet){showToast(t().low,'lose');return;}
+  udAnim=true;addMoney(-udBet);
+  const next=randCard(),curR=crank(udCur.v),nextR=crank(next.v);
+  const mult=dir==='same'?10:2;
+  const ok=dir==='up'?nextR>curR:dir==='down'?nextR<curR:nextR===curR;
+  udPrev=udCur;udCur=next;renderUpDown();
+  setTimeout(()=>{
+    const el=document.getElementById('ud-result');
+    if(ok){const p=Math.round(udBet*mult*payoutMult());addMoney(p);udStreak++;if(el){el.style.cssText='background:#dcfce7;color:#16a34a;padding:7px 18px;border-radius:18px;font-size:14px;font-weight:800';el.textContent=`✅ ${udPrev.v}→${next.v}  +$${p.toLocaleString()}`;}showToast(`+$${p.toLocaleString()}`,'win');}
+    else{udStreak=0;if(el){el.style.cssText='background:#fee2e2;color:#dc2626;padding:7px 18px;border-radius:18px;font-size:14px;font-weight:800';el.textContent=`❌ ${udPrev.v}→${next.v}  -$${udBet.toLocaleString()}`;}showToast(t().lose+udBet.toLocaleString(),'lose');}
+    setTimeout(()=>{udAnim=false;},400);
+  },180);
+}
+
+// ═══════════════════════════════════════════════════════════
+// BACCARAT
+// ═══════════════════════════════════════════════════════════
+const BSUITS=['♠','♥','♦','♣'],BVALS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+function mkDeck(){return BSUITS.flatMap(s=>BVALS.map(v=>({s,v}))).sort(()=>Math.random()-.5);}
+function bv(v){return v==='A'?1:['J','Q','K','10'].includes(v)?0:parseInt(v);}
+function bscore(cards){return cards.reduce((s,c)=>s+bv(c.v),0)%10;}
+let baccBet=1000,baccChoice='player',baccP=[],baccBk=[],baccPhase='bet';
+function renderBaccarat(){
+  const bets=[1000,5000,10000,50000,100000];
+  const choices=[{id:'player',label:t().player,bg:'#3b82f6'},{id:'banker',label:t().banker,bg:'#ef4444'},{id:'tie',label:`${t().tie} ×8`,bg:'#22c55e'}];
+  const ch=(cards)=>cards.map(c=>`<div class="card ${['♥','♦'].includes(c.s)?'red':'black'}">${c.v}${c.s}</div>`).join('');
+  const b=document.getElementById('main-body');
+  b.innerHTML=`<div class="center">
+    <div class="bacc-section"><div class="bacc-label">${t().player} (${baccP.length?bscore(baccP):'-'})</div><div class="card-row">${ch(baccP)}</div></div>
+    <div class="bacc-section"><div class="bacc-label">${t().banker} (${baccBk.length?bscore(baccBk):'-'})</div><div class="card-row">${ch(baccBk)}</div></div>
+    <div id="bacc-msg" style="font-size:16px;font-weight:800;color:#0f172a;min-height:24px"></div>
+    <div class="choice-row">${choices.map(c=>`<button class="chip${baccChoice===c.id?' active':''}" onclick="setBC('${c.id}')" style="${baccChoice===c.id?'background:'+c.bg+';color:#fff;border-color:'+c.bg:''}">${c.label}</button>`).join('')}</div>
+    ${betInput(baccBet,'setBB')}
+    <div class="bet-row">${bets.map(v=>`<button class="chip${baccBet===v?' active':''}" onclick="setBB(${v})">$${v.toLocaleString()}</button>`).join('')}</div>
+    ${baccPhase==='bet'?`<button class="action-btn" onclick="doBacc()" ${money<baccBet?'disabled':''}>${t().deal} · $${baccBet.toLocaleString()}</button>`:`<button class="action-btn" onclick="baccPhase='bet';renderBaccarat()">${t().again}</button>`}
+  </div>`;
+}
+function setBC(c){baccChoice=c;renderBaccarat();}
+function setBB(v){baccBet=v;renderBaccarat();}
+function doBacc(){
+  if(money<baccBet)return;
+  addMoney(-baccBet);
+  const deck=mkDeck();baccP=[deck[0],deck[2]];baccBk=[deck[1],deck[3]];
+  let d=deck.slice(4);
+  const ps=bscore(baccP),bs=bscore(baccBk);
+  if(ps<=5&&ps<8&&bs<8)baccP.push(d.shift());
+  if(bs<=5&&bs<8&&ps<8)baccBk.push(d.shift());
+  baccPhase='over';
+  const fp=bscore(baccP),fb=bscore(baccBk);
+  let win=false,mult=0,msg='';
+  if(fp===fb){msg=`Tie ${fp}`;if(baccChoice==='tie'){win=true;mult=8;}}
+  else if(fp>fb){msg=`${t().player} ${fp} vs ${fb}`;if(baccChoice==='player'){win=true;mult=2;}}
+  else{msg=`${t().banker} ${fb} vs ${fp}`;if(baccChoice==='banker'){win=true;mult=1.95;}}
+  if(win){const p=Math.round(baccBet*mult*payoutMult());addMoney(p);showToast(t().win+p.toLocaleString(),'win');}
+  else{if(shieldCount()>0){consumeShield();addMoney(baccBet);showToast('🛡️ 보호막!','win');}else showToast(t().lose+baccBet.toLocaleString(),'lose');}
+  renderBaccarat();setTimeout(()=>{const el=document.getElementById('bacc-msg');if(el)el.textContent=msg;},50);
+}
+
+// ═══════════════════════════════════════════════════════════
+// COIN FLIP
+// ═══════════════════════════════════════════════════════════
+let coinBet=1000,coinChoice='heads',coinFlip=false;
+function renderCoin(){
+  const bets=[1000,5000,10000,50000,100000];
+  const b=document.getElementById('main-body');
+  b.innerHTML=`<div class="center">
+    <div style="width:100px;height:100px;border-radius:50%;background:${coinChoice==='heads'?'#f59e0b':'#64748b'};display:flex;align-items:center;justify-content:center;font-size:46px;box-shadow:0 6px 20px rgba(0,0,0,0.13)" id="coin">${coinChoice==='heads'?'👑':'🦅'}</div>
+    <div style="display:flex;gap:10px">
+      <button class="chip${coinChoice==='heads'?' active':''}" onclick="setCC('heads')" style="${coinChoice==='heads'?'background:#f59e0b;color:#fff;border-color:#f59e0b':''}">👑 ${t().heads} ×2</button>
+      <button class="chip${coinChoice==='tails'?' active':''}" onclick="setCC('tails')" style="${coinChoice==='tails'?'background:#64748b;color:#fff;border-color:#64748b':''}">🦅 ${t().tails} ×2</button>
+    </div>
+    ${betInput(coinBet,'setCB')}
+    <div class="bet-row">${bets.map(v=>`<button class="chip${coinBet===v?' active':''}" onclick="setCB(${v})">$${v.toLocaleString()}</button>`).join('')}</div>
+    <button class="action-btn" id="coin-btn" onclick="doCoin()" ${coinFlip||money<coinBet?'disabled':''}>${t().flip} · $${coinBet.toLocaleString()}</button>
+  </div>`;
+}
+function setCC(c){coinChoice=c;renderCoin();}
+function setCB(v){coinBet=v;renderCoin();}
+function doCoin(){
+  if(coinFlip||money<coinBet)return;
+  coinFlip=true;addMoney(-coinBet);
+  const result=Math.random()<.5?'heads':'tails';
+  const win=result===coinChoice;
+  if(win){const p=Math.round(coinBet*2*payoutMult());addMoney(p);showToast(t().win+p.toLocaleString(),'win');}
+  else{if(shieldCount()>0){consumeShield();addMoney(coinBet);showToast('🛡️ 환불','win');}else showToast(t().lose+coinBet.toLocaleString(),'lose');}
+  coinFlip=false;
+  setTimeout(()=>{coinChoice=result;renderCoin();},50);
+}
+
+// ═══════════════════════════════════════════════════════════
+// BITCOIN
+// ═══════════════════════════════════════════════════════════
+let btcPrice=parseFloat(safeLS.getItem('fbtc'))||87500000;
+let btcHist=JSON.parse(safeLS.getItem('fbtchist')||'[]');
+let btcBet=100000,btcChoice=null,btcWaiting=false,btcPriceAtBet=0;
+setInterval(()=>{
+  const ch=(Math.random()-.48)*btcPrice*0.008;
+  btcPrice=Math.max(10000000,Math.round(btcPrice+ch));
+  btcHist.push(btcPrice);if(btcHist.length>60)btcHist=btcHist.slice(-60);
+  safeLS.setItem('fbtc',btcPrice);safeLS.setItem('fbtchist',JSON.stringify(btcHist));
+  if(currentTab===6)renderBitcoin();
+},2000);
+function renderBitcoin(){
+  const bets=[50000,100000,500000,1000000,5000000];
+  const ch24=btcHist.length>1?btcPrice-btcHist[0]:0;
+  const pct=btcHist.length>1?((ch24/btcHist[0])*100).toFixed(2):0;
+  const W=440,H=110,pad=8,pts=btcHist.length<2?[btcPrice,btcPrice]:btcHist.slice(-50);
+  const mn=Math.min(...pts),mx=Math.max(...pts),rng=mx-mn||1;
+  const xs=pts.map((_,i)=>pad+i*(W-2*pad)/(pts.length-1));
+  const ys=pts.map(p=>H-pad-(p-mn)/rng*(H-2*pad));
+  const lc=ch24>=0?'#22c55e':'#ef4444';
+  const areaD=`M${xs[0]},${H-pad} `+xs.map((x,i)=>`L${x},${ys[i]}`).join(' ')+` L${xs[xs.length-1]},${H-pad} Z`;
+  const b=document.getElementById('main-body');
+  b.innerHTML=`<div class="center" style="gap:12px">
+    <div style="width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:16px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <div><div style="font-size:12px;color:#94a3b8;font-weight:600">₿ Bitcoin</div><div style="font-size:24px;font-weight:900;color:#0f172a">₩${btcPrice.toLocaleString()}</div></div>
+        <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:${lc}">${ch24>=0?'▲':'▼'} ${Math.abs(pct)}%</div><div style="font-size:11px;color:#94a3b8">${ch24>=0?'+':''}₩${ch24.toLocaleString()}</div></div>
+      </div>
+      <svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block;border-radius:6px">
+        <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${lc}" stop-opacity="0.22"/><stop offset="100%" stop-color="${lc}" stop-opacity="0"/></linearGradient></defs>
+        <path d="${areaD}" fill="url(#bg)"/>
+        <polyline points="${xs.map((x,i)=>x+','+ys[i]).join(' ')}" fill="none" stroke="${lc}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="${xs[xs.length-1]}" cy="${ys[ys.length-1]}" r="4" fill="${lc}"/>
+      </svg>
+    </div>
+    ${btcWaiting?`<div style="background:#fef9c3;border:1.5px solid #fde047;border-radius:12px;padding:14px;width:100%;text-align:center"><div style="font-size:15px;font-weight:700;color:#ca8a04">⏳ 5초 후 결과…</div><div style="font-size:12px;color:#94a3b8;margin-top:4px">베팅가: ₩${btcPriceAtBet.toLocaleString()}</div></div>`:
+    `<div style="display:flex;gap:8px;width:100%">
+      <button onclick="setBtcC('up')" style="flex:1;padding:12px 0;border:2px solid ${btcChoice==='up'?'#22c55e':'#e2e8f0'};border-radius:10px;background:${btcChoice==='up'?'#dcfce7':'#fff'};color:${btcChoice==='up'?'#16a34a':'#64748b'};font-weight:800;font-size:12px;cursor:pointer">▲ 오를것 ×${btcMult().toFixed(1)}</button>
+      <button onclick="setBtcC('down')" style="flex:1;padding:12px 0;border:2px solid ${btcChoice==='down'?'#ef4444':'#e2e8f0'};border-radius:10px;background:${btcChoice==='down'?'#fee2e2':'#fff'};color:${btcChoice==='down'?'#dc2626':'#64748b'};font-weight:800;font-size:12px;cursor:pointer">▼ 내릴것 ×${btcMult().toFixed(1)}</button>
+    </div>`}
+    ${betInput(btcBet,'setBtcB')}
+    <div class="bet-row">${bets.map(v=>`<button class="chip${btcBet===v?' active':''}" onclick="setBtcB(${v})">₩${v.toLocaleString()}</button>`).join('')}</div>
+    ${btcWaiting?'':`<button class="action-btn" onclick="doBtc()" ${!btcChoice||money<btcBet?'disabled':''} style="opacity:${btcChoice&&money>=btcBet?1:.4}">베팅 · ₩${btcBet.toLocaleString()}</button>`}
+    <div id="btc-res" style="min-height:28px;text-align:center;font-weight:800;font-size:14px"></div>
+  </div>`;
+}
+function setBtcC(c){btcChoice=c;renderBitcoin();}
+function setBtcB(v){btcBet=v;renderBitcoin();}
+function doBtc(){
+  if(!btcChoice||btcWaiting||money<btcBet)return;
+  btcWaiting=true;btcPriceAtBet=btcPrice;addMoney(-btcBet);renderBitcoin();
+  const mc=btcChoice;
+  setTimeout(()=>{
+    const diff=btcPrice-btcPriceAtBet,up=diff>0;
+    const win=(mc==='up'&&up)||(mc==='down'&&!up);
+    if(win){const p=Math.round(btcBet*btcMult());addMoney(p);showToast('₩'+p.toLocaleString()+' 획득!','win');}
+    else showToast('₩'+btcBet.toLocaleString()+' 손실','lose');
+    btcWaiting=false;btcChoice=null;renderBitcoin();
+    setTimeout(()=>{const el=document.getElementById('btc-res');if(!el)return;const d2=btcPrice-btcPriceAtBet;if(win){el.style.color='#16a34a';el.textContent=`✅ ${d2>=0?'▲':'▼'} ₩${Math.abs(d2).toLocaleString()} 예측 성공!`;}else{el.style.color='#dc2626';el.textContent=`❌ ${d2>=0?'▲':'▼'} ₩${Math.abs(d2).toLocaleString()} 예측 실패`;}},80);
+  },5000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// MARKET (gems + profit/loss display)
+// ═══════════════════════════════════════════════════════════
+function renderMarket(){
+  const b=document.getElementById('main-body');
+  b.innerHTML=`<div>
+    ${buyQtyBar()}
+    <div class="section-title">${t().liveMarket}</div>
+    <div class="market-grid">
+      ${GEM_BASE.map(g=>{
+        const price=Math.round(gemPrices[g.id]),diff=price-g.base,owned=inventory[g.id]||0;
+        const avgBuy=gemBuyPrices[g.id]||g.base;
+        const pnl=owned>0?Math.round((price-avgBuy)*owned):0;
+        const pnlColor=pnl>=0?'#16a34a':'#ef4444';
+        return `<div class="gem-card">
+          <div class="gem-emoji">${g.emoji}</div>
+          <div class="gem-name">${t().gemNames[g.id]}</div>
+          <div class="gem-price">$${price.toLocaleString()}</div>
+          <div style="font-size:10px;color:#94a3b8">${t().basePrice}: $${g.base.toLocaleString()}</div>
+          <div style="font-size:11px;color:${diff>=0?'#16a34a':'#ef4444'};font-weight:700">${diff>=0?'▲':'▼'} $${Math.abs(diff).toLocaleString()}</div>
+          <div class="gem-owned">${t().owned}: ${owned}${owned>0?` | <span style="color:${pnlColor};font-weight:700">${pnl>=0?'+':''}\$${pnl.toLocaleString()}</span>`:''}</div>
+          <div style="font-size:10px;color:#94a3b8;margin-bottom:5px">${t().buyAt}: $${price.toLocaleString()}</div>
+          <div class="gem-btns">
+            <button class="gem-btn" style="background:#3b82f6" onclick="buyGem('${g.id}')" ${money<price?'disabled':''}>${t().buy}</button>
+            <button class="gem-btn" style="background:#64748b" onclick="sellGem('${g.id}')" ${!owned?'disabled':''}>${t().sell}</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+function buyGem(id){
+  const unit=Math.round(gemPrices[id]);
+  let qty=buyQty,maxAff=Math.floor(money/unit);
+  if(maxAff<1){showToast(t().low,'lose');return;}
+  if(qty>maxAff)qty=maxAff;
+  const cost=unit*qty;
+  addMoney(-cost);
+  const prev=inventory[id]||0,prevAvg=gemBuyPrices[id]||unit;
+  inventory[id]=prev+qty;
+  gemBuyPrices[id]=Math.round((prevAvg*prev+unit*qty)/(prev+qty));
+  save();renderMarket();showToast(`${GEM_BASE.find(g=>g.id===id).emoji} x${qty} -$${cost.toLocaleString()}`,'info');
+}
+function sellGem(id){
+  if(!(inventory[id]>0))return;
+  const unit=Math.round(gemPrices[id]),avgBuy=gemBuyPrices[id]||unit;
+  let qty=Math.min(buyQty,inventory[id]);
+  const total=unit*qty,pnl=(unit-avgBuy)*qty;
+  addMoney(total);inventory[id]-=qty;
+  save();renderMarket();
+  showToast(`${GEM_BASE.find(g=>g.id===id).emoji} x${qty} +$${total.toLocaleString()} (${pnl>=0?'+':''}$${pnl.toLocaleString()})`,pnl>=0?'win':'info');
+}
+
+// ═══════════════════════════════════════════════════════════
+// SHOP (items + titles)
+// ═══════════════════════════════════════════════════════════
+function renderShop(){
+  const b=document.getElementById('main-body');
+  const tierOrder=['common','rare','epic','legendary'];
+  const tierLabel={common:{ko:'일반',en:'Common',c:'#64748b'},rare:{ko:'희귀',en:'Rare',c:'#3b82f6'},epic:{ko:'영웅',en:'Epic',c:'#8b5cf6'},legendary:{ko:'전설',en:'Legendary',c:'#d97706'}};
+  // active effects
+  const activeList=ITEM_DEFS.filter(d=>hasEffect(d.effect));
+  const efBar=activeList.length?`<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:10px 12px;margin-bottom:12px">
+    <div style="font-size:11px;color:#16a34a;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">⚡ ${t().activeEffects}</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap">${activeList.map(d=>{const e=activeEffects[d.effect];const rem=e&&e.duration!==-1&&e.expiresAt&&e.expiresAt!==Infinity?Math.max(0,Math.ceil((e.expiresAt-Date.now())/1000)):null;return`<span style="background:#dcfce7;color:#16a34a;font-size:11px;font-weight:700;padding:2px 8px;border-radius:8px">${d.emoji} ${rem!==null?rem+'s':'∞'}</span>`;}).join('')}</div></div>`:'';
+  // titles
+  const earned=TITLES.filter(ti=>userTitles.includes(ti.id));
+  const nextT=TITLES.find(ti=>!userTitles.includes(ti.id));
+  const tiBar=`<div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px;margin-bottom:12px">
+    <div style="font-size:11px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px">🏅 ${t().titleCollection}</div>
+    ${earned.length===0?`<div style="font-size:12px;color:#94a3b8">$100,000 달성 시 첫 칭호!</div>`:''}
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px">${TITLES.map(ti=>{const has=userTitles.includes(ti.id),isAct=activeTitle===ti.id;return`<button onclick="setActTitle('${ti.id}')" ${!has?'disabled':''} style="border:2px solid ${isAct?ti.color:'#e2e8f0'};background:${has?ti.bg:'#f1f5f9'};color:${has?ti.color:'#94a3b8'};padding:3px 9px;border-radius:8px;font-size:11px;font-weight:700;cursor:${has?'pointer':'not-allowed'};opacity:${has?1:.4}">${ti.emoji} ${lang==='ko'?ti.ko:ti.en}${isAct?' ✓':''}</button>`;}).join('')}</div>
+    <div style="font-size:11px;color:#94a3b8">${t().nextTitle}: ${nextT?`${nextT.emoji} $${nextT.threshold.toLocaleString()}`:t().allTitles}</div>
+  </div>`;
+  // workers
+  const wkSection=`<div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px;margin-bottom:12px">
+    <div style="font-size:11px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">👷 ${t().workerTitle}</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:10px">${t().workerDesc} (10초마다 자동 은행 입금)</div>
+    <div style="display:flex;gap:8px;margin-bottom:6px">
+      <div style="flex:1;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:20px">🧑‍💼</div>
+        <div style="font-size:12px;font-weight:700;color:#0f172a">${t().workerNormal}</div>
+        <div style="font-size:11px;color:#94a3b8">$10/10초</div>
+        <div style="font-size:13px;font-weight:800;color:#0f172a;margin:4px 0">$${WORKER_NORMAL_PRICE.toLocaleString()}</div>
+        <div style="font-size:12px;color:#64748b;margin-bottom:6px">${t().workerCount}: ${normalWorkers}</div>
+        <button class="item-buy-btn" onclick="buyWorker('normal')" ${money<WORKER_NORMAL_PRICE?'disabled':''}>${t().workerBuy}</button>
+      </div>
+      <div style="flex:1;background:#1a0a2e;border:1.5px solid #7c3aed;border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:20px">🥷</div>
+        <div style="font-size:12px;font-weight:700;color:#c084fc">${t().workerUnder}</div>
+        <div style="font-size:11px;color:#a78bfa">$50/10초</div>
+        <div style="font-size:13px;font-weight:800;color:#fff;margin:4px 0">$${WORKER_UNDER_PRICE.toLocaleString()}</div>
+        <div style="font-size:12px;color:#a78bfa;margin-bottom:6px">${t().workerCount}: ${underWorkers}</div>
+        <button class="item-buy-btn" style="background:#7c3aed" onclick="buyWorker('under')" ${money<WORKER_UNDER_PRICE?'disabled':''}>${t().workerBuy}</button>
+      </div>
+    </div>
+  </div>`;
+  let html=`<div>${buyQtyBar()}${efBar}${tiBar}${wkSection}`;
+  tierOrder.forEach(tier=>{
+    const tl=tierLabel[tier];
+    html+=`<div class="shop-tier-title" style="color:${tl.c};font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:12px 0 7px;padding-bottom:3px;border-bottom:1px solid #f1f5f9">${tl[lang]||tl.ko}</div>`;
+    ITEM_DEFS.filter(d=>d.tier===tier).forEach(def=>{
+      const isActive=hasEffect(def.effect);
+      const e=activeEffects[def.effect];
+      const rem=e&&e.duration!==-1&&e.expiresAt&&e.expiresAt!==Infinity?Math.max(0,Math.ceil((e.expiresAt-Date.now())/1000)):null;
+      const sq=def.effect==='shield3'&&e?e.qty||3:def.effect==='shield'?1:null;
+      html+=`<div class="item-card ${isActive?'owned':''} ${tier==='legendary'?'legendary':''}">
+        <div class="item-emoji">${def.emoji}</div>
+        <div class="item-info">
+          <div class="item-name">${t().itemNames[def.id]}</div>
+          <div class="item-desc">${t().itemDescs[def.id]}</div>
+          <div class="item-effect">${def.id==='shield'||def.id==='shield3'?'🛡️ 보호막':'⚡ '+def.id}</div>
+          <div class="item-price">$${def.price.toLocaleString()}</div>
+        </div>
+        ${isActive?`<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <span style="background:#dcfce7;color:#16a34a;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px">${def.duration===-1?'PERM':sq!==null?sq+'x LEFT':rem+'s'}</span>
+          <button class="item-buy-btn active-btn" onclick="buyItem('${def.id}')">+연장</button>
+        </div>`:`<button class="item-buy-btn" onclick="buyItem('${def.id}')" ${money<def.price?'disabled':''}>${t().buy}</button>`}
+      </div>`;
+    });
+  });
+  html+='</div>';b.innerHTML=html;
+  if(!b._st)b._st=setInterval(()=>{if(currentTab===9)renderShop();else{clearInterval(b._st);b._st=null;}},1000);
+}
+function setActTitle(id){if(!userTitles.includes(id))return;activeTitle=id;save();updateHUD();if(currentTab===9)renderShop();}
+function buyItem(id){
+  const def=ITEM_DEFS.find(d=>d.id===id);if(!def)return;
+  let qty=buyQty,maxAff=Math.floor(money/def.price);
+  if(maxAff<1){showToast(t().low,'lose');return;}
+  if(qty>maxAff)qty=maxAff;
+  addMoney(-def.price*qty);
+  for(let i=0;i<qty;i++)activateEffect(def);
+  save();updateHUD();
+  showToast(`${def.emoji} ${t().itemNames[def.id]} x${qty} 활성!`,'win');
+  if(currentTab===9)renderShop();
+}
+function buyWorker(type){
+  const price=type==='normal'?WORKER_NORMAL_PRICE:WORKER_UNDER_PRICE;
+  let qty=buyQty,maxAff=Math.floor(money/price);
+  if(maxAff<1){showToast(t().low,'lose');return;}
+  if(qty>maxAff)qty=maxAff;
+  addMoney(-price*qty);
+  if(type==='normal')normalWorkers+=qty;else underWorkers+=qty;
+  save();showToast(`👷 ${type==='normal'?t().workerNormal:t().workerUnder} x${qty} 고용!`,'win');
+  if(currentTab===9)renderShop();
+}
+
+// ═══════════════════════════════════════════════════════════
+// BANK
+// ═══════════════════════════════════════════════════════════
+function renderBank(){
+  const b=document.getElementById('main-body');
+  b.innerHTML=`<div>
+    <div class="bank-card">
+      <div style="font-size:13px;color:#93c5fd;font-weight:600">🏦 ${t().bankTitle}</div>
+      <div class="bank-balance">$${Math.round(bankMoney).toLocaleString()}</div>
+      <div class="bank-interest">💹 ${t().bankInterest}</div>
+      <div style="font-size:11px;color:#64748b;margin-top:6px">보유 현금: $${money.toLocaleString()}</div>
+    </div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:8px">${t().amount}</div>
+    <input class="bank-input" type="number" id="bank-amt" placeholder="0" min="0"/>
+    <div class="bank-btns">
+      <button class="bank-btn" style="background:#0f172a;color:#fff" onclick="doDeposit()">${t().deposit}</button>
+      <button class="bank-btn" style="background:#f8fafc;color:#0f172a;border:1.5px solid #e2e8f0" onclick="doWithdraw()">${t().withdraw}</button>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="chip" onclick="setBAmt(money)">전액 입금</button>
+      <button class="chip" onclick="setBAmt(bankMoney)">전액 출금</button>
+      <button class="chip" onclick="setBAmt(Math.round(money/2))">절반 입금</button>
+    </div>
+  </div>`;
+}
+function setBAmt(v){const el=document.getElementById('bank-amt');if(el)el.value=Math.max(0,Math.round(v));}
+function doDeposit(){
+  const amt=parseInt(document.getElementById('bank-amt').value||0);
+  if(!amt||amt<=0)return;if(money<amt){showToast(t().low,'lose');return;}
+  addMoney(-amt);bankMoney+=amt;save();updateHUD();showToast(`🏦 입금 $${amt.toLocaleString()}`,'win');renderBank();
+}
+function doWithdraw(){
+  const amt=parseInt(document.getElementById('bank-amt').value||0);
+  if(!amt||amt<=0)return;if(bankMoney<amt){showToast('은행 잔액 부족!','lose');return;}
+  bankMoney-=amt;addMoney(amt);save();updateHUD();showToast(`🏦 출금 $${amt.toLocaleString()}`,'info');renderBank();
+}
+
+// ═══════════════════════════════════════════════════════════
+// INVENTORY
+// ═══════════════════════════════════════════════════════════
+function renderInventory(){
+  const b=document.getElementById('main-body');
+  const slots=[];
+  // gems
+  GEM_BASE.forEach(g=>{const qty=inventory[g.id]||0;if(qty>0){const price=Math.round(gemPrices[g.id]),avgBuy=gemBuyPrices[g.id]||price,pnl=Math.round((price-avgBuy)*qty);slots.push({emoji:g.emoji,name:t().gemNames[g.id],qty,val:price*qty,pnl,type:'gem',id:g.id});}});
+  // x-drugs
+  if(xDrugQty>0)slots.push({emoji:'💊',name:t().xDrug,qty:xDrugQty,val:xDrugQty*X_DRUG_PRICE,pnl:0,type:'xdrug',id:'xdrug'});
+  // items with perm effect
+  ITEM_DEFS.filter(d=>hasEffect(d.effect)&&d.duration===-1).forEach(d=>slots.push({emoji:d.emoji,name:t().itemNames[d.id],qty:1,val:d.price,pnl:0,type:'item',id:d.id}));
+  const totalVal=slots.reduce((s,x)=>s+x.val,0);
+  // fill to multiple of 5
+  while(slots.length%5!==0)slots.push(null);
+  b.innerHTML=`<div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="section-title" style="margin:0">${t().inventory}</div>
+      <div style="font-size:12px;color:#64748b">${t().totalAsset}: <b style="color:#0f172a">$${totalVal.toLocaleString()}</b></div>
+    </div>
+    <div class="inv-grid">
+      ${slots.map(s=>s?`<div class="inv-slot" onclick="invAction('${s.type}','${s.id}')">
+        <div class="inv-slot-emoji">${s.emoji}</div>
+        <div class="inv-slot-name">${s.name}</div>
+        ${s.qty>1?`<div class="inv-slot-qty">${s.qty}</div>`:''}
+        ${s.type==='gem'?`<div class="inv-slot-val" style="color:${s.pnl>=0?'#16a34a':'#ef4444'}">${s.pnl>=0?'+':''}\$${s.pnl.toLocaleString()}</div>`:''}
+      </div>`:`<div class="inv-slot empty"><div style="font-size:18px;color:#e2e8f0">+</div></div>`).join('')}
+    </div>
+    ${xDrugQty>0?`<div style="background:#1a0a2e;border:1.5px solid #7c3aed;border-radius:14px;padding:14px;margin-top:16px">
+      <div style="font-size:13px;color:#c084fc;font-weight:800;margin-bottom:4px">💊 ${t().xDrug} × ${xDrugQty}</div>
+      <div style="font-size:11px;color:#a78bfa;margin-bottom:10px">${t().xDrugDesc}</div>
+      <div style="display:flex;gap:8px">
+        <button class="item-buy-btn" style="background:#3b82f6;flex:1;padding:9px 0;text-align:center" onclick="sellXDrug('normal')">${t().sellNormal}</button>
+        <button class="item-buy-btn" style="background:#7c3aed;flex:1;padding:9px 0;text-align:center" onclick="sellXDrug('suspect')">${t().sellSuspect}</button>
+      </div>
+    </div>`:''}
+  </div>`;
+}
+function invAction(type,id){
+  if(type==='gem'){const g=GEM_BASE.find(x=>x.id===id);if(g&&inventory[id]>0){const price=Math.round(gemPrices[id]),avg=gemBuyPrices[id]||price,pnl=price-avg;addMoney(price);inventory[id]--;save();renderInventory();showToast(`${g.emoji} 판매 +$${price.toLocaleString()} (${pnl>=0?'이익 +':'손실 '}$${pnl.toLocaleString()})`,pnl>=0?'win':'info');}}
+}
+function sellXDrug(mode){
+  if(xDrugQty<=0)return;
+  if(mode==='normal'){const p=X_DRUG_PRICE*2;addMoney(p);xDrugQty--;save();showToast(`💊 판매 +$${p.toLocaleString()}`,'win');}
+  else{const lucky=Math.random()<.5;const mult=lucky?3:.5;const p=Math.round(X_DRUG_PRICE*mult);addMoney(p);xDrugQty--;save();showToast(`💊 수상한 상인: ${lucky?'대박':'꽝'} ${lucky?'+':'+'}$${p.toLocaleString()}`,lucky?'win':'lose');}
+  renderInventory();
+}
+
+// ═══════════════════════════════════════════════════════════
+// UNDERGROUND
+// ═══════════════════════════════════════════════════════════
+function renderUnderground(){
+  const b=document.getElementById('main-body');
+  if(inUnderground){renderUGInside();return;}
+  b.innerHTML=`<div>
+    <div class="underground-bg">
+      <div class="underground-title">🚇 ${t().ugTitle}</div>
+      <div style="font-size:12px;color:#a78bfa;margin-bottom:12px">${t().ugSub}</div>
+      ${hasTicket?`<div style="background:#dcfce7;color:#16a34a;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:700;margin-bottom:10px">🎫 티켓 보유중</div>`:`<div style="background:#fee2e2;color:#ef4444;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:700;margin-bottom:10px">🎫 티켓 없음 ($${TICKET_PRICE.toLocaleString()})</div>`}
+      ${!hasTicket?`<button class="ug-btn" style="background:#7c3aed" onclick="buyTicket()">${t().ugBuyTicket}</button>`:''}
+      ${hasTicket?`<button class="ug-btn" style="background:#7c3aed" onclick="tryEnter()">${t().ugEnter}</button>`:''}
+    </div>
+    <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;margin-top:12px">
+      <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:8px">지하상가 정보</div>
+      <div style="font-size:12px;color:#64748b;line-height:1.7">
+        • 입장 성공률 60% (티켓 1회용)<br/>
+        • 지하 작업: $100/탭 (도둑 5% 확률)<br/>
+        • X약 구매 후 지상 판매 가능<br/>
+        • 일반 판매 2배 / 수상한 상인 50%:3배 or 0.5배
+      </div>
+    </div>
+  </div>`;
+}
+function buyTicket(){
+  if(money<TICKET_PRICE){showToast(t().low,'lose');return;}
+  addMoney(-TICKET_PRICE);hasTicket=true;save();showToast(t().ugTicketBought,'win');renderUnderground();
+}
+function tryEnter(){
+  if(!hasTicket)return;
+  hasTicket=false;save();
+  const ov=document.getElementById('loading-overlay');
+  const lt=document.getElementById('lo-text');
+  const ls=document.getElementById('lo-sub');
+  if(lt)lt.textContent='지하로 내려가는 중...';
+  if(ls)ls.textContent='⚠️ 도둑을 조심하세요! 소지금을 잃을 수 있습니다';
+  if(ov)ov.classList.add('show');
+  setTimeout(()=>{
+    if(ov)ov.classList.remove('show');
+    if(Math.random()<.6){inUnderground=true;save();showToast(t().ugEnterSuccess,'win');if(currentTab===14)renderUGInside();}
+    else{save();showToast(t().ugEnterFail,'lose');if(currentTab===14)renderUnderground();}
+  },2200);
+}
+function renderUGInside(){
+  const b=document.getElementById('main-body');
+  b.innerHTML=`<div>
+    <div style="background:linear-gradient(135deg,#0a0a0f,#1a0a2e);border-radius:14px;padding:18px;color:#fff;margin-bottom:14px">
+      <div style="font-size:18px;font-weight:900;color:#c084fc;margin-bottom:4px">🚇 지하상가</div>
+      <div style="font-size:12px;color:#a78bfa">현재 지하에 있습니다</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <div style="flex:1;background:#0a0a0f;border:1.5px solid #374151;border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:28px;margin-bottom:6px">⚒️</div>
+        <div style="font-size:13px;font-weight:800;color:#e5e7eb;margin-bottom:3px">지하 작업</div>
+        <div style="font-size:11px;color:#9ca3af;margin-bottom:10px">$100/탭 (도둑 5%)</div>
+        <button style="width:100%;padding:10px 0;background:#374151;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer" onclick="doUGWork()">작업하기</button>
+      </div>
+      <div style="flex:1;background:#0a0a0f;border:1.5px solid #7c3aed;border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:28px;margin-bottom:6px">💊</div>
+        <div style="font-size:13px;font-weight:800;color:#c084fc;margin-bottom:3px">지하 상점</div>
+        <div style="font-size:11px;color:#a78bfa;margin-bottom:10px">X약 $${X_DRUG_PRICE.toLocaleString()}</div>
+        <button style="width:100%;padding:10px 0;background:#7c3aed;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;${money<X_DRUG_PRICE?'opacity:.4;cursor:not-allowed':''}" onclick="buyXDrug()" ${money<X_DRUG_PRICE?'disabled':''}>구매</button>
+      </div>
+    </div>
+    <div id="ug-log" style="background:#0a0a0f;border:1px solid #374151;border-radius:10px;padding:10px;min-height:60px;font-size:12px;color:#9ca3af;margin-bottom:12px"></div>
+    <button style="width:100%;padding:12px 0;background:#1e3a5f;border:none;border-radius:10px;color:#fff;font-weight:700;font-size:13px;cursor:pointer" onclick="leaveUG()">${t().ugBack}</button>
+    <div style="margin-top:8px;font-size:11px;color:#94a3b8;text-align:center">지상에 돌아가면 다시 티켓이 필요합니다</div>
+  </div>`;
+}
+let ugLogLines=[];
+function ugLog(msg,color='#9ca3af'){
+  ugLogLines.unshift(`<div style="color:${color}">${msg}</div>`);
+  if(ugLogLines.length>6)ugLogLines=ugLogLines.slice(0,6);
+  const el=document.getElementById('ug-log');if(el)el.innerHTML=ugLogLines.join('');
+}
+function doUGWork(){
+  if(!inUnderground)return;
+  if(Math.random()<.05){
+    const stolen=Math.round(money*(.1+Math.random()*.2));
+    addMoney(-stolen);ugLog(`💀 도둑! -$${stolen.toLocaleString()}`,'#ef4444');showToast(t().ugStolen,'lose');
+  } else {
+    addMoney(100);ugLog(`⚒️ ${t().ugWorkSuccess}`,'#c084fc');showToast('+$100','win');
+  }
+}
+function buyXDrug(){
+  if(money<X_DRUG_PRICE){showToast(t().low,'lose');return;}
+  addMoney(-X_DRUG_PRICE);xDrugQty++;save();
+  ugLog(`💊 X약 구매! 보유 ${xDrugQty}개`,'#c084fc');showToast('💊 X약 구매!','win');
+  renderUGInside();
+}
+function leaveUG(){inUnderground=false;save();renderUnderground();}
+
+// ═══════════════════════════════════════════════════════════
+// RANKING
+// ═══════════════════════════════════════════════════════════
+async function renderRanking(){
+  const b=document.getElementById('main-body');
+  if(!b)return;
+  b.innerHTML='<div style="text-align:center;padding:32px;color:#94a3b8">🏆 불러오는 중...</div>';
+  const entries=await supaGetRankings();
+  const medals=['🥇','🥈','🥉'];
+  b.innerHTML=`<div>
+    <div class="rank-header">
+      <div><div class="rank-title">${t().leaderboard}</div><div class="rank-my">${t().yourNW}: <b>$${Math.round(netWorth()).toLocaleString()}</b></div></div>
+    </div>
+    <div class="rank-list">
+      ${entries.length===0?`<div style="color:#94a3b8;text-align:center;padding:24px">${t().noScores}</div>`:
+        entries.map((r,i)=>`<div class="rank-row${r.name===currentUser?' me':''}">
+          <span class="rank-medal">${medals[i]||'#'+(i+1)}</span>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+              <span class="rank-name">${r.name}${r.name===currentUser?' '+t().me:''}</span>
+              ${r.title?`<span class="title-badge" style="background:${r.title.bg};color:${r.title.color}">${r.title.emoji}${lang==='ko'?r.title.ko:r.title.en}</span>`:''}
+            </div>
+            <div style="font-size:10px;color:#94a3b8">현금 $${r.money.toLocaleString()} | 은행 $${r.bank.toLocaleString()}</div>
+          </div>
+          <div class="rank-val">$${r.nw.toLocaleString()}</div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function rnd(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+
+// ═══════════════════════════════════════════════════════════
+// MAIL SYSTEM
+// ═══════════════════════════════════════════════════════════
+function getMails(user){try{return JSON.parse(safeLS.getItem('fmail_'+user)||'[]');}catch{return[];}}
+function saveMails(user,mails){safeLS.setItem('fmail_'+user,JSON.stringify(mails));}
+function sendMail(toUser,fromUser,subject,body,items){
+  if(!safeLS.getItem('fdata_'+toUser))return false;
+  const mails=getMails(toUser);
+  mails.unshift({id:Date.now(),from:fromUser,subject,body,items:items||[],read:false,ts:new Date().toLocaleString()});
+  saveMails(toUser,mails);return true;
+}
+function claimMail(mailId){
+  const mails=getMails(currentUser);
+  const mail=mails.find(m=>m.id===mailId);
+  if(!mail||mail.claimed)return;
+  mail.read=true;mail.claimed=true;
+  if(mail.items){
+    mail.items.forEach(item=>{
+      if(item.type==='money'){addMoney(item.amount);}
+      else if(item.type==='gem'){const g=GEM_BASE.find(x=>x.id===item.id);if(g){inventory[item.id]=(inventory[item.id]||0)+item.qty;}}
+      else if(item.type==='xdrug'){xDrugQty+=item.qty;}
+      else if(item.type==='item'){const def=ITEM_DEFS.find(d=>d.id===item.id);if(def)activateEffect(def);}
+    });
+  }
+  saveMails(currentUser,mails);save();updateHUD();
+  showToast('📬 우편 수령 완료!','win');
+  if(currentTab===13)renderMail();
+}
+function renderMail(){
+  const b=document.getElementById('main-body');
+  const mails=getMails(currentUser);
+  const unread=mails.filter(m=>!m.read).length;
+  b.innerHTML=`<div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="section-title" style="margin:0">📬 우편함</div>
+      ${unread>0?`<span style="background:#ef4444;color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:10px">${unread} 새 우편</span>`:''}
+    </div>
+    ${mails.length===0?'<div style="color:#94a3b8;text-align:center;padding:32px">우편이 없습니다</div>':
+    mails.map(m=>`<div class="mail-item${m.read?'':' unread'}">
+      ${!m.read?'<div class="mail-badge">NEW</div>':''}
+      <div style="font-size:13px;font-weight:800;color:#0f172a;margin-bottom:2px">${m.subject}</div>
+      <div style="font-size:11px;color:#94a3b8;margin-bottom:6px">발신: ${m.from} · ${m.ts}</div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:8px;line-height:1.5">${m.body}</div>
+      ${m.items&&m.items.length>0&&!m.claimed?`<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:8px;margin-bottom:8px;font-size:12px;color:#16a34a;font-weight:700">
+        📦 첨부: ${m.items.map(i=>i.type==='money'?'$'+i.amount.toLocaleString():i.type==='gem'?GEM_BASE.find(g=>g.id===i.id)?.emoji+i.qty:i.type==='xdrug'?'💊×'+i.qty:ITEM_DEFS.find(d=>d.id===i.id)?.emoji||'?').join(', ')}
+        <button style="margin-left:8px;padding:4px 10px;background:#16a34a;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer" onclick="claimMail(${m.id})">수령</button>
+      </div>`:''}
+      ${m.claimed?'<div style="font-size:11px;color:#94a3b8">✅ 수령 완료</div>':''}
+    </div>`).join('')}
+  </div>`;
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// FREE BOARD
+// ═══════════════════════════════════════════════════════════
+function getPosts(){
+  try{return JSON.parse(safeLS.getItem('fboard')||'[]');}
+  catch{return[];}
+}
+function savePosts(posts){safeLS.setItem('fboard',JSON.stringify(posts.slice(0,200)));}
+
+function renderBoard(){
+  const b=document.getElementById('main-body');
+  const posts=getPosts();
+  const ti=getActiveTitle();
+  const userBadge=ti?` <span style="background:${ti.bg};color:${ti.color};font-size:10px;font-weight:800;padding:1px 6px;border-radius:6px">${ti.emoji}${lang==='ko'?ti.ko:ti.en}</span>`:'';
+
+  b.innerHTML=`<div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="section-title" style="margin:0">💬 자유게시판</div>
+      <div style="font-size:11px;color:#94a3b8">${posts.length}개의 글</div>
+    </div>
+
+    <!-- Write box -->
+    <div class="board-write-box">
+      <div style="font-size:12px;color:#64748b;font-weight:600;margin-bottom:8px">✏️ 글쓰기</div>
+      <input class="board-inp" id="board-title-inp" placeholder="제목 (최대 50자)" maxlength="50"/>
+      <textarea class="board-inp" id="board-body-inp" placeholder="내용을 입력하세요... (최대 500자)" maxlength="500" rows="4"></textarea>
+      <button style="width:100%;padding:10px;background:#0f172a;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer" onclick="submitPost()">게시하기</button>
+    </div>
+
+    <!-- Posts -->
+    ${posts.length===0?'<div style="color:#94a3b8;text-align:center;padding:32px;font-size:14px">아직 글이 없어요. 첫 글을 작성해보세요!</div>':
+    posts.map((p,i)=>{
+      const liked=(p.likes||[]).includes(currentUser);
+      const titleObj=p.titleData;
+      const authorBadge=titleObj?` <span style="background:${titleObj.bg};color:${titleObj.color};font-size:10px;font-weight:800;padding:1px 6px;border-radius:6px">${titleObj.emoji}${lang==='ko'?titleObj.koLabel:titleObj.enLabel}</span>`:'';
+      return`<div class="board-post" id="post-${p.id}">
+        <div class="board-post-header">
+          <div>
+            <span class="board-post-author">${p.author}</span>${authorBadge}
+            ${p.author==='개발자'?'<span style="background:#fef9c3;color:#ca8a04;font-size:10px;font-weight:800;padding:1px 6px;border-radius:6px;margin-left:4px">👑개발자</span>':''}
+          </div>
+          <span class="board-post-time">${p.ts}</span>
+        </div>
+        ${p.title?`<div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:4px">${escHtml(p.title)}</div>`:''}
+        <div class="board-post-body">${escHtml(p.body)}</div>
+        <div class="board-post-footer">
+          <button class="board-like-btn${liked?' liked':''}" onclick="likePost(${p.id})">
+            ${liked?'❤️':'🤍'} ${(p.likes||[]).length}
+          </button>
+          ${(isDev()||p.author===currentUser)?`<button class="board-del-btn" onclick="deletePost(${p.id})">삭제</button>`:''}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function escHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function submitPost(){
+  const titleEl=document.getElementById('board-title-inp');
+  const bodyEl=document.getElementById('board-body-inp');
+  const title=(titleEl?titleEl.value.trim():'');
+  const body=(bodyEl?bodyEl.value.trim():'');
+  if(!body){showToast('내용을 입력하세요','lose');return;}
+  const posts=getPosts();
+  const ti=getActiveTitle();
+  const post={
+    id:Date.now(),
+    author:currentUser,
+    title:title,
+    body:body,
+    ts:new Date().toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    likes:[],
+    titleData:ti?{bg:ti.bg,color:ti.color,emoji:ti.emoji,koLabel:lang==='ko'?ti.ko:ti.ko,enLabel:ti.en}:null
+  };
+  posts.unshift(post);
+  savePosts(posts);
+  showToast('✅ 게시글 등록!','win');
+  renderBoard();
+}
+
+function likePost(id){
+  const posts=getPosts();
+  const p=posts.find(x=>x.id===id);
+  if(!p)return;
+  p.likes=p.likes||[];
+  if(p.likes.includes(currentUser)){
+    p.likes=p.likes.filter(u=>u!==currentUser);
+  } else {
+    p.likes.push(currentUser);
+  }
+  savePosts(posts);
+  // just update like button without full re-render
+  renderBoard();
+}
+
+function deletePost(id){
+  if(!isDev()&&getPosts().find(p=>p.id===id)?.author!==currentUser)return;
+  if(!confirm('이 글을 삭제할까요?'))return;
+  const posts=getPosts().filter(p=>p.id!==id);
+  savePosts(posts);
+  showToast('🗑️ 삭제됨','info');
+  renderBoard();
+}
+
+// ═══════════════════════════════════════════════════════════
+// DEVELOPER PANEL
+// ═══════════════════════════════════════════════════════════
+function isDev(){return currentUser==='개발자';}
+function getAllUsers(){
+  const users=[];
+  for(let i=0;i<safeLS.length;i++){
+    const key=safeLS.key(i);
+    if(key&&key.startsWith('fdata_')){
+      const name=key.replace('fdata_','');
+      try{const d=JSON.parse(safeLS.getItem(key));users.push({name,data:d});}catch{}
+    }
+  }
+  return users;
+}
+function renderDev(){
+  if(!isDev()){document.getElementById('main-body').innerHTML='<div style="color:#ef4444;text-align:center;padding:40px;font-weight:700">🚫 접근 권한 없음</div>';return;}
+  const b=document.getElementById('main-body');
+  const users=getAllUsers();
+  b.innerHTML=`<div class="dev-panel">
+    <div class="dev-title">🛠️ 개발자 패널</div>
+
+    <!-- USER LIST -->
+    <div class="dev-section">
+      <div class="dev-section-title">👥 유저 목록 (${users.length}명)</div>
+      ${users.map(u=>{
+        const d=u.data;const nw=(d.money||0)+(d.bankMoney||0);
+        return`<div class="user-row">
+          <span style="flex:1;font-size:13px;font-weight:700">${u.name}</span>
+          <span style="font-size:11px;color:#94a3b8">$${nw.toLocaleString()}</span>
+          <button class="dev-btn blue" onclick="devEditUser('${u.name}')">편집</button>
+          ${u.name!=='개발자'?`<button class="dev-btn red" onclick="devDeleteUser('${u.name}')">삭제</button>`:''}
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- GIVE MONEY -->
+    <div class="dev-section">
+      <div class="dev-section-title">💰 재화 조정</div>
+      <input class="dev-inp" id="dev-target" placeholder="대상 유저명"/>
+      <input class="dev-inp" id="dev-amount" type="number" placeholder="금액 (음수 가능)"/>
+      <div>
+        <button class="dev-btn green" onclick="devGiveMoney('cash')">현금 지급</button>
+        <button class="dev-btn green" onclick="devGiveMoney('bank')">은행 지급</button>
+        <button class="dev-btn red" onclick="devGiveMoney('set')">금액 설정</button>
+      </div>
+    </div>
+
+    <!-- GIVE ITEM -->
+    <div class="dev-section">
+      <div class="dev-section-title">🎁 아이템 지급</div>
+      <input class="dev-inp" id="dev-item-target" placeholder="대상 유저명"/>
+      <select class="dev-inp" id="dev-item-type">
+        <option value="">-- 선택 --</option>
+        ${ITEM_DEFS.map(d=>`<option value="${d.id}">${d.emoji} ${d.id}</option>`).join('')}
+        ${GEM_BASE.map(g=>`<option value="gem_${g.id}">${g.emoji} ${g.id} (보석)</option>`).join('')}
+        <option value="xdrug">💊 X약</option>
+      </select>
+      <input class="dev-inp" id="dev-item-qty" type="number" placeholder="수량 (아이템은 1)" value="1"/>
+      <button class="dev-btn purple" onclick="devGiveItem()">지급</button>
+    </div>
+
+    <!-- SEND MAIL -->
+    <div class="dev-section">
+      <div class="dev-section-title">📬 우편 발송</div>
+      <input class="dev-inp" id="dev-mail-to" placeholder="수신자 (all = 전체)"/>
+      <input class="dev-inp" id="dev-mail-subj" placeholder="제목"/>
+      <textarea class="dev-inp" id="dev-mail-body" placeholder="내용" rows="3" style="resize:vertical"></textarea>
+      <div style="font-size:11px;color:#94a3b8;margin-bottom:6px">첨부 (JSON): {"type":"money","amount":1000} 또는 {"type":"gem","id":"dia","qty":1} 또는 {"type":"xdrug","qty":1} 또는 {"type":"item","id":"lucky"}</div>
+      <textarea class="dev-inp" id="dev-mail-items" placeholder='[{"type":"money","amount":10000}]' rows="2" style="resize:vertical"></textarea>
+      <button class="dev-btn blue" onclick="devSendMail()">📤 발송</button>
+    </div>
+
+    <!-- DEV SELF ITEMS -->
+    <div class="dev-section">
+      <div class="dev-section-title">⚡ 개발자 즉시 사용</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">
+        ${ITEM_DEFS.map(d=>`<button class="dev-btn purple" onclick="devUseSelf('item','${d.id}')">${d.emoji}</button>`).join('')}
+        <button class="dev-btn green" onclick="devUseSelf('money',1000000)">+$1M</button>
+        <button class="dev-btn green" onclick="devUseSelf('money',1000000000)">+$1B</button>
+        <button class="dev-btn red" onclick="devUseSelf('reset')">리셋</button>
+      </div>
+    </div>
+
+    <!-- BROADCAST -->
+    <div class="dev-section">
+      <div class="dev-section-title">📢 공지 발송 (전체 우편)</div>
+      <input class="dev-inp" id="dev-bc-subj" placeholder="공지 제목"/>
+      <textarea class="dev-inp" id="dev-bc-body" placeholder="공지 내용" rows="3"></textarea>
+      <button class="dev-btn yellow" style="background:#f59e0b;color:#000" onclick="devBroadcast()">📢 전체 발송</button>
+    </div>
+
+  </div>`;
+}
+
+function devEditUser(name){
+  const d=JSON.parse(safeLS.getItem('fdata_'+name)||'{}');
+  const newMoney=prompt(`[${name}] 현금 설정 (현재: $${(d.money||0).toLocaleString()}):`,d.money||0);
+  if(newMoney===null)return;
+  const newBank=prompt(`[${name}] 은행 설정 (현재: $${(d.bankMoney||0).toLocaleString()}):`,d.bankMoney||0);
+  if(newBank===null)return;
+  d.money=parseInt(newMoney)||0;d.bankMoney=parseInt(newBank)||0;
+  safeLS.setItem('fdata_'+name,JSON.stringify(d));
+  alert(`✅ ${name} 수정 완료`);renderDev();
+}
+function devDeleteUser(name){
+  if(name==='개발자'){alert('개발자 계정은 삭제할 수 없습니다');return;}
+  if(!confirm(`정말로 ${name} 계정을 삭제할까요?`))return;
+  safeLS.removeItem('fdata_'+name);safeLS.removeItem('facc_'+name);safeLS.removeItem('fmail_'+name);
+  alert(`🗑️ ${name} 삭제 완료`);renderDev();
+}
+function devGiveMoney(mode){
+  const target=document.getElementById('dev-target').value.trim();
+  const amt=parseInt(document.getElementById('dev-amount').value)||0;
+  if(!target){alert('대상 유저 입력');return;}
+  const key='fdata_'+target;
+  const d=JSON.parse(safeLS.getItem(key)||'{}');
+  if(mode==='cash')d.money=(d.money||0)+amt;
+  else if(mode==='bank')d.bankMoney=(d.bankMoney||0)+amt;
+  else if(mode==='set')d.money=amt;
+  safeLS.setItem(key,JSON.stringify(d));
+  if(target===currentUser){money=d.money||0;bankMoney=d.bankMoney||0;updateHUD();}
+  showToast(`✅ ${target}에게 재화 적용`,'win');renderDev();
+}
+function devGiveItem(){
+  const target=document.getElementById('dev-item-target').value.trim();
+  const itemId=document.getElementById('dev-item-type').value;
+  const qty=parseInt(document.getElementById('dev-item-qty').value)||1;
+  if(!target||!itemId){alert('대상/아이템 선택');return;}
+  const key='fdata_'+target;
+  const d=JSON.parse(safeLS.getItem(key)||'{}');
+  if(itemId.startsWith('gem_')){const gid=itemId.replace('gem_','');d.inventory=d.inventory||{};d.inventory[gid]=(d.inventory[gid]||0)+qty;}
+  else if(itemId==='xdrug'){d.xDrugQty=(d.xDrugQty||0)+qty;}
+  else{const def=ITEM_DEFS.find(x=>x.id===itemId);if(def){d.activeEffects=d.activeEffects||{};d.activeEffects[def.effect]={duration:-1,expiresAt:-1};}}
+  safeLS.setItem(key,JSON.stringify(d));
+  if(target===currentUser){load();updateHUD();}
+  showToast(`✅ ${target}에게 아이템 지급`,'win');renderDev();
+}
+function devSendMail(){
+  const to=document.getElementById('dev-mail-to').value.trim();
+  const subj=document.getElementById('dev-mail-subj').value.trim();
+  const body=document.getElementById('dev-mail-body').value.trim();
+  let items=[];
+  try{items=JSON.parse(document.getElementById('dev-mail-items').value||'[]');}catch{}
+  if(!to||!subj){alert('수신자/제목 필요');return;}
+  if(to==='all'){const users=getAllUsers();users.forEach(u=>sendMail(u.name,'개발자(관리자)',subj,body,items));alert(`📬 전체 ${users.length}명에게 발송`);}
+  else{const ok=sendMail(to,'개발자(관리자)',subj,body,items);alert(ok?`📬 ${to}에게 발송 완료`:'❌ 유저를 찾을 수 없음');}
+  renderDev();
+}
+function devBroadcast(){
+  const subj=document.getElementById('dev-bc-subj').value.trim();
+  const body=document.getElementById('dev-bc-body').value.trim();
+  if(!subj||!body){alert('제목/내용 필요');return;}
+  const users=getAllUsers();users.forEach(u=>sendMail(u.name,'📢 공지',subj,body,[]));
+  alert(`📢 전체 ${users.length}명에게 공지 발송`);renderDev();
+}
+function devUseSelf(type,val){
+  if(type==='item'){const def=ITEM_DEFS.find(d=>d.id===val);if(def){activateEffect(def);save();updateHUD();showToast(def.emoji+' 활성화!','win');if(currentTab===RENDERS_BASE.length)renderDev();}}
+  else if(type==='money'){addMoney(val);showToast('+$'+val.toLocaleString(),'win');}
+  else if(type==='reset'){if(confirm('개발자 재화를 초기화할까요?')){money=0;bankMoney=0;save();updateHUD();renderDev();}}
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+// STOCKS / LOAN / EXCHANGE / LOTTERY / ATTENDANCE / QUESTS
+// ═══════════════════════════════════════════════════════════
+const STOCK_BASE=[
+  {id:'AAPL',name:'Apple Co.',base:18000,vol:.04,emoji:'🍎'},
+  {id:'TSLA',name:'Tesvo Motors',base:35000,vol:.08,emoji:'🚗'},
+  {id:'NVDA',name:'Nvex Chip',base:120000,vol:.06,emoji:'🎮'},
+  {id:'GOLD',name:'GoldMine',base:80000,vol:.03,emoji:'🥇'},
+  {id:'MEME',name:'Meme Coin',base:500,vol:.25,emoji:'🐸'},
+];
+let stockPrices={};
+STOCK_BASE.forEach(s=>stockPrices[s.id]=s.base);
+
+function stockValue(){return STOCK_BASE.reduce((s,x)=>s+(stocks[x.id]||0)*(stockPrices[x.id]||x.base),0);}
+const LOAN_RATE_PER_MIN=0.0005; // 0.05%/min interest
+const LOAN_LIMIT=()=>Math.max(1000000, Math.floor((money+bankMoney+stockValue())*0.5)+5000000);
+function loanOwed(){
+  if(!loanAmount||!loanTakenAt)return loanAmount||0;
+  const mins=(Date.now()-loanTakenAt)/60000;
+  return Math.round(loanAmount*Math.pow(1+LOAN_RATE_PER_MIN,mins));
+}
+
+// Stock price drift
+setInterval(()=>{
+  STOCK_BASE.forEach(s=>{stockPrices[s.id]=Math.max(10,Math.round(stockPrices[s.id]*(1+(Math.random()-.5)*s.vol*2)));safeLS.setItem('fstk_'+s.id,stockPrices[s.id]);});
+  if(currentTab===8)renderStocks();
+  updateHUD();
+},5000);
+
+// ───── STOCKS ─────
+function renderStocks(){
+  const b=document.getElementById('main-body');
+  b.innerHTML=`<div>
+    <div class="section-title">📈 ${lang==='ko'?'주식':'Stocks'}</div>
+    <div style="font-size:11px;color:#94a3b8;margin-bottom:10px">${lang==='ko'?'5초마다 가격 변동':'Prices update every 5s'}</div>
+    <div class="market-grid">
+    ${STOCK_BASE.map(s=>{
+      const price=Math.round(stockPrices[s.id]),owned=stocks[s.id]||0;
+      const avg=stockBuyPrices[s.id]||price,pnl=owned>0?Math.round((price-avg)*owned):0;
+      const diff=price-s.base;
+      return `<div class="gem-card">
+        <div class="gem-emoji">${s.emoji}</div>
+        <div class="gem-name">${s.id}</div>
+        <div style="font-size:10px;color:#94a3b8">${s.name}</div>
+        <div class="gem-price">$${price.toLocaleString()}</div>
+        <div style="font-size:11px;color:${diff>=0?'#16a34a':'#ef4444'};font-weight:700">${diff>=0?'▲':'▼'} $${Math.abs(diff).toLocaleString()}</div>
+        <div class="gem-owned">${lang==='ko'?'보유':'Owned'}: ${owned}${owned>0?` | <span style="color:${pnl>=0?'#16a34a':'#ef4444'};font-weight:700">${pnl>=0?'+':''}\$${pnl.toLocaleString()}</span>`:''}</div>
+        <div class="gem-btns">
+          <button class="gem-btn" style="background:#3b82f6" onclick="buyStock('${s.id}',1)" ${money<price?'disabled':''}>+1</button>
+          <button class="gem-btn" style="background:#1d4ed8" onclick="buyStock('${s.id}',10)" ${money<price*10?'disabled':''}>+10</button>
+          <button class="gem-btn" style="background:#64748b" onclick="sellStock('${s.id}',1)" ${!owned?'disabled':''}>-1</button>
+        </div>
+      </div>`;
+    }).join('')}
+    </div>
+  </div>`;
+}
+function buyStock(id,qty){
+  const price=Math.round(stockPrices[id]),cost=price*qty;
+  if(money<cost){showToast(t().low,'lose');return;}
+  addMoney(-cost);
+  const prev=stocks[id]||0,prevAvg=stockBuyPrices[id]||price;
+  stocks[id]=prev+qty;
+  stockBuyPrices[id]=Math.round((prevAvg*prev+price*qty)/(prev+qty));
+  save();renderStocks();
+}
+function sellStock(id,qty){
+  const owned=stocks[id]||0;if(owned<=0)return;
+  qty=Math.min(qty,owned);
+  const price=Math.round(stockPrices[id]),avg=stockBuyPrices[id]||price,pnl=(price-avg)*qty;
+  addMoney(price*qty);stocks[id]=owned-qty;
+  if(stocks[id]<=0){delete stocks[id];delete stockBuyPrices[id];}
+  save();renderStocks();
+  showToast(`${id} +$${(price*qty).toLocaleString()} (${pnl>=0?'+':''}$${pnl.toLocaleString()})`,pnl>=0?'win':'info');
+}
+
+// ───── LOAN ─────
+function renderLoan(){
+  const b=document.getElementById('main-body');
+  const owed=loanOwed(),limit=LOAN_LIMIT();
+  b.innerHTML=`<div>
+    <div class="bank-card" style="background:linear-gradient(135deg,#7c2d12,#dc2626)">
+      <div style="font-size:13px;color:#fecaca;font-weight:600">💳 ${lang==='ko'?'대출':'Loan'}</div>
+      <div class="bank-balance">$${owed.toLocaleString()}</div>
+      <div class="bank-interest">⚠️ ${lang==='ko'?'분당 0.05% 이자':'0.05% interest/min'}</div>
+      <div style="font-size:11px;color:#fecaca;margin-top:6px">${lang==='ko'?'최대 한도':'Max'}: $${limit.toLocaleString()}</div>
+    </div>
+    <div style="font-size:13px;color:#64748b;margin:10px 0 8px">${lang==='ko'?'금액':'Amount'}</div>
+    <input class="bank-input" type="number" id="loan-amt" placeholder="0" min="0"/>
+    <div class="bank-btns">
+      <button class="bank-btn" style="background:#dc2626;color:#fff" onclick="doBorrow()">${lang==='ko'?'대출받기':'Borrow'}</button>
+      <button class="bank-btn" style="background:#f8fafc;color:#0f172a;border:1.5px solid #e2e8f0" onclick="doRepay()">${lang==='ko'?'상환':'Repay'}</button>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="chip" onclick="document.getElementById('loan-amt').value=${Math.max(0,limit-loanAmount)}">${lang==='ko'?'최대 대출':'Max borrow'}</button>
+      <button class="chip" onclick="document.getElementById('loan-amt').value=${owed}">${lang==='ko'?'전액 상환':'Repay all'}</button>
+    </div>
+    <div style="margin-top:14px;font-size:11px;color:#94a3b8;line-height:1.6">
+      ${lang==='ko'?'※ 갚지 않으면 이자가 계속 붙습니다. 순자산에서 차감됩니다.':'※ Interest accrues. Subtracted from net worth.'}
+    </div>
+  </div>`;
+}
+function doBorrow(){
+  const amt=parseInt(document.getElementById('loan-amt').value||0);if(!amt||amt<=0)return;
+  const limit=LOAN_LIMIT();
+  if(loanAmount+amt>limit){showToast(lang==='ko'?'한도 초과!':'Over limit!','lose');return;}
+  if(loanAmount===0)loanTakenAt=Date.now();
+  else {loanAmount=loanOwed();loanTakenAt=Date.now();}
+  loanAmount+=amt;questProgress.tookLoan=true;addMoney(amt);save();renderLoan();
+}
+function doRepay(){
+  const amt=parseInt(document.getElementById('loan-amt').value||0);if(!amt||amt<=0)return;
+  const owed=loanOwed();const pay=Math.min(amt,owed,money);
+  if(pay<=0){showToast(t().low,'lose');return;}
+  addMoney(-pay);loanAmount=owed-pay;if(loanAmount<=0){loanAmount=0;loanTakenAt=0;}
+  else loanTakenAt=Date.now();
+  save();renderLoan();showToast(`💳 -$${pay.toLocaleString()}`,'info');
+}
+
+// ───── EXCHANGE (P2P listings via shared key) ─────
+function getListings(){try{return JSON.parse(safeLS.getItem('fexch')||'[]');}catch{return [];}}
+function setListings(arr){safeLS.setItem('fexch',JSON.stringify(arr));}
+function renderExchange(){
+  const b=document.getElementById('main-body');
+  const listings=getListings();
+  const myGems=GEM_BASE.filter(g=>(inventory[g.id]||0)>0);
+  b.innerHTML=`<div>
+    <div class="section-title">🔄 ${lang==='ko'?'유저 거래소':'Exchange'}</div>
+    <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:14px;margin-bottom:14px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px">📤 ${lang==='ko'?'판매 등록':'List for sale'}</div>
+      <select class="bank-input" id="ex-gem">
+        ${myGems.length?myGems.map(g=>`<option value="${g.id}">${g.emoji} ${t().gemNames[g.id]} (×${inventory[g.id]})</option>`).join(''):`<option value="">${lang==='ko'?'보유 보석 없음':'No gems'}</option>`}
+      </select>
+      <input class="bank-input" id="ex-price" type="number" placeholder="${lang==='ko'?'판매 가격':'Price'}"/>
+      <button class="bank-btn" style="background:#16a34a;color:#fff;width:100%" onclick="listExchange()">${lang==='ko'?'등록':'List'}</button>
+    </div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px">🛒 ${lang==='ko'?'전체 매물':'All listings'} (${listings.length})</div>
+    ${listings.length?listings.map((l,i)=>{
+      const g=GEM_BASE.find(x=>x.id===l.gemId);if(!g)return'';
+      const mine=l.seller===currentUser;
+      return `<div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px;margin-bottom:6px;display:flex;align-items:center;gap:10px">
+        <div style="font-size:24px">${g.emoji}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">${t().gemNames[g.id]} ×${l.qty||1}</div>
+          <div style="font-size:11px;color:#64748b">@${l.seller} · $${l.price.toLocaleString()}</div>
+        </div>
+        ${mine?`<button class="gem-btn" style="background:#ef4444" onclick="cancelExchange(${i})">${lang==='ko'?'취소':'Cancel'}</button>`
+              :`<button class="gem-btn" style="background:#3b82f6" onclick="buyExchange(${i})" ${money<l.price?'disabled':''}>${lang==='ko'?'구매':'Buy'}</button>`}
+      </div>`;
+    }).join(''):`<div style="text-align:center;color:#94a3b8;padding:30px;font-size:13px">${lang==='ko'?'등록된 매물 없음':'No listings'}</div>`}
+  </div>`;
+}
+function listExchange(){
+  const gemId=document.getElementById('ex-gem').value;
+  const price=parseInt(document.getElementById('ex-price').value||0);
+  if(!gemId||!(inventory[gemId]>0)||price<=0)return;
+  inventory[gemId]--;if(inventory[gemId]<=0)delete inventory[gemId];
+  const listings=getListings();
+  listings.unshift({seller:currentUser,gemId,price,qty:1,at:Date.now()});
+  setListings(listings.slice(0,200));save();renderExchange();showToast(lang==='ko'?'📤 등록 완료':'Listed','win');
+}
+function cancelExchange(i){
+  const listings=getListings();const l=listings[i];if(!l||l.seller!==currentUser)return;
+  inventory[l.gemId]=(inventory[l.gemId]||0)+(l.qty||1);
+  listings.splice(i,1);setListings(listings);save();renderExchange();
+}
+function buyExchange(i){
+  const listings=getListings();const l=listings[i];if(!l)return;
+  if(money<l.price){showToast(t().low,'lose');return;}
+  addMoney(-l.price);inventory[l.gemId]=(inventory[l.gemId]||0)+(l.qty||1);
+  // pay seller
+  const sk='fdata_'+l.seller;const sd=JSON.parse(safeLS.getItem(sk)||'null');
+  if(sd){sd.money=(sd.money||0)+l.price;safeLS.setItem(sk,JSON.stringify(sd));}
+  listings.splice(i,1);setListings(listings);save();renderExchange();showToast(lang==='ko'?'🛒 구매 완료':'Bought','win');
+}
+
+// ───── LOTTERY ─────
+const LOTTO_PRICE=50000;
+function getLottoState(){try{return JSON.parse(safeLS.getItem('flotto')||'null')||{drawTime:Date.now()+600000,winners:[]};}catch{return {drawTime:Date.now()+600000,winners:[]};}}
+function setLottoState(s){safeLS.setItem('flotto',JSON.stringify(s));}
+function renderLottery(){
+  const b=document.getElementById('main-body');
+  const st=getLottoState();
+  const remain=Math.max(0,Math.floor((st.drawTime-Date.now())/1000));
+  const mm=Math.floor(remain/60),ss=remain%60;
+  b.innerHTML=`<div>
+    <div class="section-title">🎟️ ${lang==='ko'?'복권':'Lottery'}</div>
+    <div class="bank-card" style="background:linear-gradient(135deg,#7c3aed,#db2777)">
+      <div style="font-size:13px;color:#fce7f3;font-weight:600">${lang==='ko'?'다음 추첨':'Next draw'}</div>
+      <div class="bank-balance">${mm}:${String(ss).padStart(2,'0')}</div>
+      <div style="font-size:11px;color:#fce7f3;margin-top:6px">${lang==='ko'?'1장':'1 ticket'} = $${LOTTO_PRICE.toLocaleString()}</div>
+    </div>
+    <div style="font-size:13px;color:#64748b;margin:10px 0">${lang==='ko'?'6개 숫자(1~45) 자동 선택. 일치 개수만큼 상금':'Auto-pick 6 numbers (1-45). Prize by matches'}</div>
+    <button class="bank-btn" style="background:#7c3aed;color:#fff;width:100%;margin-bottom:8px" onclick="buyLotto()" ${money<LOTTO_PRICE?'disabled':''}>🎟️ ${lang==='ko'?'구매':'Buy'} ($${LOTTO_PRICE.toLocaleString()})</button>
+    <button class="bank-btn" style="background:#0f172a;color:#fff;width:100%;margin-bottom:14px" onclick="drawLotto()">🎰 ${lang==='ko'?'즉시 추첨 (티켓이 있을 때)':'Draw now (if any ticket)'}</button>
+    <div style="font-size:13px;font-weight:700;margin-bottom:6px">${lang==='ko'?'내 티켓':'My tickets'} (${lotteryTickets.length})</div>
+    ${lotteryTickets.length?lotteryTickets.map(t2=>`<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px;margin-bottom:4px;font-size:13px;font-weight:700;letter-spacing:1px">${t2.join(' · ')}</div>`).join(''):`<div style="color:#94a3b8;text-align:center;padding:14px;font-size:12px">${lang==='ko'?'티켓 없음':'No tickets'}</div>`}
+    <div style="font-size:11px;color:#94a3b8;margin-top:14px;line-height:1.7">
+      ${lang==='ko'?'배당: 6개 일치 ×100000 / 5개 ×1000 / 4개 ×50 / 3개 ×5':'Payout: 6 match ×100k / 5 ×1k / 4 ×50 / 3 ×5'}
+    </div>
+  </div>`;
+}
+function buyLotto(){
+  if(money<LOTTO_PRICE){showToast(t().low,'lose');return;}
+  addMoney(-LOTTO_PRICE);
+  const nums=[];while(nums.length<6){const n=Math.floor(Math.random()*45)+1;if(!nums.includes(n))nums.push(n);}
+  nums.sort((a,b)=>a-b);
+  lotteryTickets.push(nums);questProgress.lottoBought=(questProgress.lottoBought||0)+1;save();renderLottery();showToast('🎟️ '+nums.join(','),'info');
+}
+function drawLotto(){
+  if(!lotteryTickets.length){showToast(lang==='ko'?'티켓 없음':'No tickets','lose');return;}
+  const win=[];while(win.length<6){const n=Math.floor(Math.random()*45)+1;if(!win.includes(n))win.push(n);}
+  win.sort((a,b)=>a-b);
+  let totalPrize=0;const results=[];
+  lotteryTickets.forEach(t2=>{
+    const match=t2.filter(n=>win.includes(n)).length;
+    const mult=match===6?100000:match===5?1000:match===4?50:match===3?5:0;
+    const prize=LOTTO_PRICE*mult;totalPrize+=prize;
+    results.push(`${t2.join(',')} → ${match}개 ${prize?'+$'+prize.toLocaleString():''}`);
+  });
+  lotteryTickets=[];if(totalPrize>0)addMoney(totalPrize);save();
+  const st=getLottoState();st.drawTime=Date.now()+600000;setLottoState(st);
+  alert((lang==='ko'?'🎯 당첨 번호: ':'🎯 Winning: ')+win.join(', ')+'\n\n'+results.join('\n')+'\n\n'+(lang==='ko'?'총 상금: ':'Total: ')+'$'+totalPrize.toLocaleString());
+  renderLottery();
+}
+
+// ───── ATTENDANCE ─────
+const ATT_REWARDS=[10000,30000,80000,200000,500000,1500000,5000000];
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function renderAttendance(){
+  const b=document.getElementById('main-body');
+  const today=todayStr();
+  const claimedToday=attendance.last===today;
+  // gap check: if last !== yesterday and !== today, streak resets on claim
+  b.innerHTML=`<div>
+    <div class="section-title">📅 ${lang==='ko'?'출석 보상':'Daily Attendance'}</div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:12px">${lang==='ko'?'연속 출석':'Streak'}: <b style="color:#0f172a">${attendance.streak}일</b></div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:14px">
+      ${ATT_REWARDS.map((r,i)=>{
+        const day=i+1;const earned=attendance.streak>=day;
+        return `<div style="background:${earned?'#dcfce7':'#f1f5f9'};border:1.5px solid ${earned?'#16a34a':'#e2e8f0'};border-radius:10px;padding:10px 4px;text-align:center">
+          <div style="font-size:10px;color:#64748b;font-weight:700">D${day}</div>
+          <div style="font-size:14px;margin:3px 0">${earned?'✅':'🎁'}</div>
+          <div style="font-size:9px;color:#0f172a;font-weight:700">$${(r>=1000000?(r/1000000).toFixed(1)+'M':r>=1000?(r/1000)+'k':r)}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <button class="bank-btn" style="background:${claimedToday?'#94a3b8':'#16a34a'};color:#fff;width:100%" onclick="claimAttendance()" ${claimedToday?'disabled':''}>
+      ${claimedToday?(lang==='ko'?'오늘 수령 완료':'Claimed today'):(lang==='ko'?'오늘 출석 받기':'Claim today')}
+    </button>
+    <div style="font-size:11px;color:#94a3b8;margin-top:10px">${lang==='ko'?'※ 하루라도 빠지면 연속 출석이 초기화됩니다':'※ Missing a day resets streak'}</div>
+  </div>`;
+}
+function claimAttendance(){
+  const today=todayStr();
+  if(attendance.last===today){showToast(lang==='ko'?'이미 수령':'Already claimed','lose');return;}
+  // yesterday check
+  const y=new Date();y.setDate(y.getDate()-1);
+  const yStr=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();
+  if(attendance.last===yStr)attendance.streak=Math.min(7,attendance.streak+1);
+  else attendance.streak=1;
+  attendance.last=today;
+  const reward=ATT_REWARDS[attendance.streak-1];
+  addMoney(reward);save();renderAttendance();showToast(`📅 +$${reward.toLocaleString()}`,'win');
+}
+
+// ───── QUESTS ─────
+const QUESTS=[
+  {id:'q_tap_100',label:{ko:'100회 탭하기',en:'Tap 100 times'},check:()=>questProgress.taps>=100,reward:50000,emoji:'💼'},
+  {id:'q_tap_1k',label:{ko:'1,000회 탭하기',en:'Tap 1,000 times'},check:()=>questProgress.taps>=1000,reward:500000,emoji:'💼'},
+  {id:'q_nw_1m',label:{ko:'순자산 $1M 달성',en:'Net worth $1M'},check:()=>netWorth()>=1000000,reward:200000,emoji:'💰'},
+  {id:'q_nw_100m',label:{ko:'순자산 $100M 달성',en:'Net worth $100M'},check:()=>netWorth()>=100000000,reward:20000000,emoji:'💎'},
+  {id:'q_nw_1b',label:{ko:'순자산 $1B 달성',en:'Net worth $1B'},check:()=>netWorth()>=1000000000,reward:200000000,emoji:'👑'},
+  {id:'q_loan',label:{ko:'대출 한번 받기',en:'Take a loan'},check:()=>loanAmount>0||questProgress.tookLoan,reward:150000,emoji:'💳'},
+  {id:'q_lotto',label:{ko:'복권 5장 구매',en:'Buy 5 lottery tickets'},check:()=>(questProgress.lottoBought||0)>=5,reward:300000,emoji:'🎟️'},
+  {id:'q_gem_5',label:{ko:'보석 5종 보유',en:'Own 5 gem types'},check:()=>GEM_BASE.filter(g=>inventory[g.id]>0).length>=5,reward:1000000,emoji:'💍'},
+  {id:'q_bank_10m',label:{ko:'은행 $10M 예금',en:'Bank $10M'},check:()=>bankMoney>=10000000,reward:1000000,emoji:'🏦'},
+  {id:'q_stock_buy',label:{ko:'주식 보유',en:'Hold any stock'},check:()=>Object.keys(stocks).some(k=>stocks[k]>0),reward:100000,emoji:'📈'},
+];
+function renderQuests(){
+  const b=document.getElementById('main-body');
+  b.innerHTML=`<div>
+    <div class="section-title">🏆 ${lang==='ko'?'도전과제':'Quests'}</div>
+    <div style="font-size:11px;color:#94a3b8;margin-bottom:12px">
+      ${lang==='ko'?'탭':'Taps'}: ${questProgress.taps} · ${lang==='ko'?'도박승':'Wins'}: ${questProgress.gambleWins}
+    </div>
+    ${QUESTS.map(q=>{
+      const done=q.check(),claimed=questClaimed.includes(q.id);
+      return `<div style="background:${claimed?'#f1f5f9':done?'#dcfce7':'#fff'};border:1.5px solid ${claimed?'#cbd5e1':done?'#16a34a':'#e2e8f0'};border-radius:12px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
+        <div style="font-size:24px">${q.emoji}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:#0f172a">${q.label[lang]}</div>
+          <div style="font-size:11px;color:#64748b">${lang==='ko'?'보상':'Reward'}: $${q.reward.toLocaleString()}</div>
+        </div>
+        ${claimed?`<span style="font-size:11px;color:#64748b;font-weight:700">${lang==='ko'?'완료':'Done'}</span>`
+                :done?`<button class="gem-btn" style="background:#16a34a" onclick="claimQuest('${q.id}')">${lang==='ko'?'수령':'Claim'}</button>`
+                     :`<span style="font-size:11px;color:#94a3b8">🔒</span>`}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+function claimQuest(id){
+  const q=QUESTS.find(x=>x.id===id);if(!q||!q.check()||questClaimed.includes(id))return;
+  questClaimed.push(id);addMoney(q.reward);save();renderQuests();showToast(`🏆 +$${q.reward.toLocaleString()}`,'win');
+}
+
+// hook into earn/gamble tracking
+// hook into earn for quest tap tracking (safe wrapper)
+const _origDoEarn=doEarn;
+doEarn=function(){_origDoEarn();questProgress.taps=(questProgress.taps||0)+1;save();};
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+(function init(){
+  try{
+    document.getElementById('lt-title').textContent=lang==='ko'?'포춘':'Fortune';
+    document.getElementById('lt-sub').textContent=lang==='ko'?'벌고, 예측하고, 수집하세요':'Earn, Predict & Collect';
+    document.getElementById('btn-login').textContent=T[lang].login;
+    document.getElementById('btn-register').textContent=T[lang].register;
+    document.getElementById('inp-name').placeholder=T[lang].nick;
+    document.getElementById('inp-pw').placeholder=T[lang].pw;
+    document.getElementById('lt-btn').textContent=T[lang].loginBtn;
+    document.querySelectorAll('.lang-toggle').forEach(b=>b.textContent=lang==='ko'?'EN':'한');
+  }catch(e){}
+  initDevAccount();
+  // Auto-login
+  let session=null;
+  try{session=localStorage.getItem('fsession');}catch(e){}
+  if(session){
+    supaGetAccount(session).then(acc=>{
+      if(acc){
+        currentUser=session;
+        supaLoad(session).then(()=>loadSharedPrices().then(()=>startApp()));
+      }
+    });
+  }
+})();/script>
+</body>
+</html>
